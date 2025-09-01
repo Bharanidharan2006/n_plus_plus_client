@@ -101,7 +101,7 @@ const DayTimeTable = ({ periods, attendance, day }) => {
             textAlign: "center",
             fontSize: 12,
             fontWeight: 500,
-            marginBottom: 8,
+            marginBottom: 6,
             marginTop: 5,
             fontFamily: "Poppins-Medium",
           }}
