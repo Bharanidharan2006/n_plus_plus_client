@@ -1,3 +1,5 @@
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -14,14 +16,32 @@ import {
   View,
 } from "react-native";
 
+const LOGIN = gql`
+  mutation LoginUser($rollNo: Float!, $password: String!) {
+    loginUser(rollno: $rollNo, password: $password) {
+      accessToken
+      refreshToken
+    }
+  }
+`;
+
 export default function Login() {
   const [rollNo, setRollNo] = useState("");
   const [password, setPassword] = useState("");
   const [secure, setSecure] = useState(true);
+  const [loginUser, { data, loading, error }] = useMutation(LOGIN);
   const router = useRouter();
 
   const handleLogin = () => {
-    console.log("Roll No:", rollNo, "Password:", password);
+    if (password === "") return;
+    loginUser({
+      variables: { rollNo: parseInt(rollNo), password: password },
+    }).then(async (d) => {
+      //await SecureStore.setItemAsync("accessToken", d.loginUser.accessToken);
+    });
+    console.log(data);
+    setPassword("");
+    setRollNo("");
   };
 
   return (
@@ -124,6 +144,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
+    marginTop: 10,
     fontFamily: "Poppins-Regular",
     color: "#FFFFFF",
   },

@@ -18,11 +18,16 @@ export default function ForgotPassword() {
   const [masterPassword, setMasterPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [masterPasswordError, setMasterPasswordError] = useState("");
   const [secure, setSecure] = useState(true);
   const router = useRouter();
 
-  const handleLogin = () => {
-    console.log("MasterPassword:", masterPassword, "Password:", password);
+  const handleSubmission = () => {
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match!");
+      return;
+    }
   };
 
   return (
@@ -50,7 +55,10 @@ export default function ForgotPassword() {
                   placeholderTextColor="#9CA3AF"
                   secureTextEntry={secure}
                   value={masterPassword}
-                  onChangeText={setMasterPassword}
+                  onChangeText={(text) => {
+                    setMasterPassword(text);
+                    if (masterPasswordError) setMasterPasswordError("");
+                  }}
                 />
                 <TouchableOpacity onPress={() => setSecure(!secure)}>
                   <MaterialIcons
@@ -60,11 +68,17 @@ export default function ForgotPassword() {
                   />
                 </TouchableOpacity>
               </View>
+              {masterPasswordError ? (
+                <Text style={styles.errorText}>{masterPasswordError}</Text>
+              ) : null}
 
               {/* Other password inputs */}
               <TextInput
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  if (passwordError) setPasswordError("");
+                }}
                 placeholder="New Password"
                 placeholderTextColor="#9CA3AF"
                 secureTextEntry
@@ -72,15 +86,21 @@ export default function ForgotPassword() {
               />
               <TextInput
                 value={confirmPassword}
-                onChangeText={setConfirmPassword}
+                onChangeText={(text) => {
+                  setConfirmPassword(text);
+                  if (passwordError) setPasswordError("");
+                }}
                 placeholder="Confirm Password"
                 placeholderTextColor="#9CA3AF"
                 secureTextEntry
                 style={styles.input}
               />
+              {passwordError ? (
+                <Text style={styles.errorText}>{passwordError}</Text>
+              ) : null}
 
               <TouchableOpacity
-                onPress={handleLogin}
+                onPress={handleSubmission}
                 style={styles.loginButton}
               >
                 <Text style={styles.loginText}>Confirm</Text>
@@ -197,5 +217,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 20,
     alignItems: "center",
+  },
+  errorText: {
+    color: "#FF4D4F",
+    fontSize: 12,
+    fontFamily: "Poppins-Regular",
+    marginBottom: 8,
+    marginLeft: 4,
   },
 });

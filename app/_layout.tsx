@@ -1,3 +1,5 @@
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client/react";
 import {
   DMSerifDisplay_400Regular,
   useFonts as useDmSerif,
@@ -15,6 +17,13 @@ import {
 import { Stack } from "expo-router";
 import React from "react";
 import { View } from "react-native";
+
+const API_LINK = "http://10.11.140.103:5000/graphql";
+
+const client = new ApolloClient({
+  link: new HttpLink({ uri: API_LINK }),
+  cache: new InMemoryCache(),
+});
 
 export default function RootLayout() {
   const [dmLoaded] = useDmSerif({
@@ -37,14 +46,16 @@ export default function RootLayout() {
   const userToken = false;
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#1a1a1a" }}>
-      <Stack screenOptions={{ headerShown: false, gestureEnabled: false }}>
-        {userToken ? (
-          <Stack.Screen name="(app)/home" />
-        ) : (
-          <Stack.Screen name="(auth)/login" />
-        )}
-      </Stack>
-    </View>
+    <ApolloProvider client={client}>
+      <View style={{ flex: 1, backgroundColor: "#1a1a1a" }}>
+        <Stack screenOptions={{ headerShown: false, gestureEnabled: false }}>
+          {userToken ? (
+            <Stack.Screen name="(app)/home" />
+          ) : (
+            <Stack.Screen name="(auth)/login" />
+          )}
+        </Stack>
+      </View>
+    </ApolloProvider>
   );
 }
