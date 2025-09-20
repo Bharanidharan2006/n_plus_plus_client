@@ -112,7 +112,7 @@ const TimeTable = () => {
   });
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={[]}>
       <Text style={styles.weekTitle}>Week One</Text>
       <Text style={styles.weekSubTitle}>
         Duration{"      :"} 12/08/2025 - 18/08/2025
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   },
   weekTitle: {
     fontSize: 28,
-    fontFamily: "Poppins-Bold",
+    fontFamily: "Poppins-SemiBold",
     color: "#fff",
     width: "95%",
     alignSelf: "center",
