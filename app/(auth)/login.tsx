@@ -1,10 +1,15 @@
-import { gql } from "@apollo/client";
-import { useMutation } from "@apollo/client/react";
+import {
+  LoginUserMutation,
+  LoginUserMutationVariables,
+} from "@/graphql_interfaces/auth.interface";
 import { MaterialIcons } from "@expo/vector-icons";
+import { gql } from "@urql/core";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import * as SecureStore from "expo-secure-store";
+import React, { useEffect, useState } from "react";
 import {
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -15,6 +20,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useMutation } from "urql";
 
 const LOGIN = gql`
   mutation LoginUser($rollNo: Float!, $password: String!) {
@@ -29,17 +35,51 @@ export default function Login() {
   const [rollNo, setRollNo] = useState("");
   const [password, setPassword] = useState("");
   const [secure, setSecure] = useState(true);
-  const [loginUser, { data, loading, error }] = useMutation(LOGIN);
+  const [errorMessage, setErrorMessage] = useState(""); // <-- New state
+  const [result, loginUser] = useMutation<
+    LoginUserMutation,
+    LoginUserMutationVariables
+  >(LOGIN);
   const router = useRouter();
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
-  const handleLogin = () => {
-    if (password === "") return;
-    loginUser({
-      variables: { rollNo: parseInt(rollNo), password: password },
-    }).then(async (d) => {
-      //await SecureStore.setItemAsync("accessToken", d.loginUser.accessToken);
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardVisible(true);
     });
-    console.log(data);
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  const handleLogin = async () => {
+    if (!rollNo || !password) return;
+
+    const variables = { rollNo: parseFloat(rollNo), password };
+    const response = await loginUser(variables);
+
+    if (response.data) {
+      const { accessToken, refreshToken } = response.data.loginUser;
+
+      // Save tokens securely
+      await SecureStore.setItemAsync("accessToken", accessToken);
+      await SecureStore.setItemAsync("refreshToken", refreshToken);
+
+      router.replace("/(app)/home");
+      setErrorMessage("");
+    } else if (response.error) {
+      console.error("Login failed", response.error);
+      // Display invalid credentials message
+      setErrorMessage(
+        "Invalid credentials. Please check your Roll No and Password."
+      );
+    }
+
     setPassword("");
     setRollNo("");
   };
@@ -87,6 +127,11 @@ export default function Login() {
                 </TouchableOpacity>
               </View>
 
+              {/* Display error message */}
+              {errorMessage ? (
+                <Text style={styles.errorText}>{errorMessage}</Text>
+              ) : null}
+
               <TouchableOpacity
                 touchSoundDisabled={false}
                 style={styles.forgotWrapper}
@@ -104,14 +149,15 @@ export default function Login() {
             </View>
           </View>
 
-          {/* Logo moved into scrollable content so it moves with keyboard */}
-          <View style={styles.iconWrapper}>
-            <Image
-              source={require("../../assets/images/logo.png")}
-              style={{ width: 20, height: 20 }}
-              resizeMode="contain"
-            />
-          </View>
+          {!keyboardVisible && (
+            <View style={styles.iconWrapper}>
+              <Image
+                source={require("../../assets/images/logo.png")}
+                style={{ width: 20, height: 20 }}
+                resizeMode="contain"
+              />
+            </View>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -206,5 +252,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 20,
     alignItems: "center",
+  },
+  errorText: {
+    color: "#F87171", // red
+    fontSize: 14,
+    marginBottom: 12,
+    fontFamily: "Poppins-Regular",
+    textAlign: "center",
   },
 });

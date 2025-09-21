@@ -8,16 +8,17 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "codegen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
-    "@apollo/client": "^4.0.5",
     "@expo-google-fonts/dm-serif-display": "^0.4.2",
     "@expo-google-fonts/poppins": "^0.4.1",
     "@expo/vector-icons": "^14.1.0",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
+    "@urql/core": "^6.0.1",
     "expo": "~53.0.22",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.7",
@@ -27,6 +28,7 @@
     "expo-install": "^0.0.0",
     "expo-linking": "~7.1.7",
     "expo-router": "~5.1.5",
+    "expo-secure-store": "~14.2.4",
     "expo-splash-screen": "~0.30.10",
     "expo-status-bar": "~2.2.3",
     "expo-symbols": "~0.4.5",
@@ -46,7 +48,7 @@
     "rxjs": "^7.8.2",
     "tslib": "^2.6.0",
     "undefined": "@expo/vector-icons/MaterialIcons",
-    "expo-secure-store": "~14.2.4"
+    "urql": "^5.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

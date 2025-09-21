@@ -1,5 +1,3 @@
-import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
-import { ApolloProvider } from "@apollo/client/react";
 import {
   DMSerifDisplay_400Regular,
   useFonts as useDmSerif,
@@ -17,12 +15,19 @@ import {
 import { Stack } from "expo-router";
 import React from "react";
 import { View } from "react-native";
+import {
+  cacheExchange,
+  createClient,
+  debugExchange,
+  fetchExchange,
+  Provider,
+} from "urql";
 
 const API_LINK = "http://10.11.140.103:5000/graphql";
 
-const client = new ApolloClient({
-  link: new HttpLink({ uri: API_LINK }),
-  cache: new InMemoryCache(),
+const client = createClient({
+  url: API_LINK,
+  exchanges: [debugExchange, cacheExchange, fetchExchange],
 });
 
 export default function RootLayout() {
@@ -46,7 +51,7 @@ export default function RootLayout() {
   const userToken = false;
 
   return (
-    <ApolloProvider client={client}>
+    <Provider value={client}>
       <View style={{ flex: 1, backgroundColor: "#1a1a1a" }}>
         <Stack screenOptions={{ headerShown: false, gestureEnabled: false }}>
           {userToken ? (
@@ -56,6 +61,6 @@ export default function RootLayout() {
           )}
         </Stack>
       </View>
-    </ApolloProvider>
+    </Provider>
   );
 }
