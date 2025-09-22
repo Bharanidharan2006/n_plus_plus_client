@@ -1,3 +1,7 @@
+import {
+  ChangePasswordMutation,
+  ChangePasswordMutationVariables,
+} from "@/graphql_interfaces/auth.interface";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -13,6 +17,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { gql, useMutation } from "urql";
+
+const FORGOT_PASSWORD = gql`
+  mutation ChangePassword($input: changePasswordInput!) {
+    changePassword(input: $input)
+  }
+`;
 
 export default function ForgotPassword() {
   const [masterPassword, setMasterPassword] = useState("");
@@ -20,13 +31,40 @@ export default function ForgotPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [masterPasswordError, setMasterPasswordError] = useState("");
+  const [generalError, setGeneralError] = useState(""); // <-- new state
+  const [result, changePassword] = useMutation<
+    ChangePasswordMutation,
+    ChangePasswordMutationVariables
+  >(FORGOT_PASSWORD);
   const [secure, setSecure] = useState(true);
+  const [rollNo, setRollNo] = useState("");
   const router = useRouter();
 
-  const handleSubmission = () => {
+  const handleSubmission = async () => {
+    setGeneralError(""); // reset before new request
+
     if (password !== confirmPassword) {
       setPasswordError("Passwords do not match!");
       return;
+    }
+
+    const variables = {
+      input: {
+        masterPassword,
+        password: confirmPassword,
+        rollno: parseFloat(rollNo),
+      },
+    };
+
+    const response = await changePassword(variables);
+
+    if (response.error || response.data?.changePassword === false) {
+      setGeneralError("Invalid credentials");
+      return;
+    }
+
+    if (response.data?.changePassword) {
+      router.replace("/(auth)/login");
     }
   };
 
@@ -41,12 +79,22 @@ export default function ForgotPassword() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.contentWrapper}>
-            <Text style={styles.title}>Lost between assignments?</Text>
+            <Text style={styles.title}>
+              Lost between <Text style={styles.accentTitle}>assignments?</Text>
+            </Text>
             <Text style={styles.subtitle}>
               Passwords can get lost too. Let’s set a new one!
             </Text>
 
             <View style={styles.formWrapper}>
+              <TextInput
+                value={rollNo}
+                onChangeText={setRollNo}
+                placeholder="Roll No"
+                placeholderTextColor="#9CA3AF"
+                style={styles.input}
+              />
+
               {/* Master Password with show/hide */}
               <View style={styles.inputWrapper}>
                 <TextInput
@@ -97,6 +145,11 @@ export default function ForgotPassword() {
               />
               {passwordError ? (
                 <Text style={styles.errorText}>{passwordError}</Text>
+              ) : null}
+
+              {/* General error */}
+              {generalError ? (
+                <Text style={styles.errorText}>{generalError}</Text>
               ) : null}
 
               <TouchableOpacity
@@ -174,6 +227,12 @@ const styles = StyleSheet.create({
     color: "#D1D5DB",
     textDecorationLine: "underline",
   },
+  accentTitle: {
+    fontSize: 34,
+    marginBottom: 10,
+    fontFamily: "DMSerifDisplay-Regular",
+    color: "#19aa59",
+  },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -205,7 +264,7 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     borderRadius: 8,
     alignItems: "center",
-    backgroundColor: "#FFF",
+    backgroundColor: "#19aa59",
     marginTop: 10,
   },
   loginText: {

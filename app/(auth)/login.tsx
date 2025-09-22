@@ -95,7 +95,9 @@ export default function Login() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.contentWrapper}>
-            <Text style={styles.title}>Welcome to your class hub</Text>
+            <Text style={styles.title}>
+              <Text style={styles.accentTitle}>Welcome</Text> to your class hub
+            </Text>
             <Text style={styles.subtitle}>
               Track. Share. Collaborate and Grow.
             </Text>
@@ -188,6 +190,12 @@ const styles = StyleSheet.create({
     fontFamily: "DMSerifDisplay-Regular",
     color: "#FFFFFF",
   },
+  accentTitle: {
+    fontSize: 34,
+    marginBottom: 10,
+    fontFamily: "DMSerifDisplay-Regular",
+    color: "#19aa59",
+  },
   subtitle: {
     fontSize: 16,
     marginTop: 10,
@@ -241,11 +249,11 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     borderRadius: 8,
     alignItems: "center",
-    backgroundColor: "#FFF",
+    backgroundColor: "#19aa59",
   },
   loginText: {
     fontSize: 16,
-    color: "#000",
+    color: "#fff",
     fontFamily: "DMSerifDisplay-Regular",
   },
   iconWrapper: {
