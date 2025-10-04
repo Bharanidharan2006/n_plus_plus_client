@@ -1,3 +1,6 @@
+import { useAuthStore } from "@/stores/auth.store";
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client/react";
 import {
   DMSerifDisplay_400Regular,
   useFonts as useDmSerif,
@@ -13,7 +16,9 @@ import {
   useFonts as usePoppins,
 } from "@expo-google-fonts/poppins";
 import { Stack } from "expo-router";
-import React from "react";
+import * as SecureStore from "expo-secure-store";
+import { StatusBar } from "expo-status-bar";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import {
   cacheExchange,
@@ -23,14 +28,28 @@ import {
   Provider,
 } from "urql";
 
-const API_LINK = "http://192.168.137.185:5000/graphql";
+const API_LINK = "http://192.168.137.202:5000/graphql";
 
 const client = createClient({
   url: API_LINK,
   exchanges: [debugExchange, cacheExchange, fetchExchange],
+  fetchOptions: () => {
+    const token = SecureStore.getItem("accessToken");
+    return {
+      headers: { authorization: token ? `Bearer ${token}` : "" },
+    };
+  },
+  preferGetMethod: false,
+});
+
+const apolloClient = new ApolloClient({
+  link: new HttpLink({ uri: API_LINK }),
+  cache: new InMemoryCache(),
 });
 
 export default function RootLayout() {
+  const setTokens = useAuthStore((state) => state.setTokens);
+  const [loggedIn, setLoggedIn] = useState(false);
   const [dmLoaded] = useDmSerif({
     "DMSerifDisplay-Regular": DMSerifDisplay_400Regular,
     // "DMSerifDisplay-Italic": DMSerifDisplay_400RegularItalic,
@@ -46,21 +65,35 @@ export default function RootLayout() {
     "Poppins-ExtraBold": Poppins_800ExtraBold,
   });
 
+  useEffect(() => {
+    const accessToken = SecureStore.getItem("accessToken");
+    const refreshToken = SecureStore.getItem("refreshToken");
+    if (accessToken && refreshToken) {
+      setTokens(accessToken, refreshToken);
+      setLoggedIn(true);
+    }
+  }, []);
+
   if (!dmLoaded && !poppinsLoaded) return null;
 
-  const userToken = false;
-
   return (
-    <Provider value={client}>
-      <View style={{ flex: 1, backgroundColor: "#1a1a1a" }}>
-        <Stack screenOptions={{ headerShown: false, gestureEnabled: false }}>
-          {userToken ? (
-            <Stack.Screen name="(app)/home" />
-          ) : (
-            <Stack.Screen name="(auth)/login" />
-          )}
-        </Stack>
-      </View>
-    </Provider>
+    <>
+      <StatusBar backgroundColor="#1d1d1d" translucent={false} style="light" />
+      <Provider value={client}>
+        <ApolloProvider client={apolloClient}>
+          <View style={{ flex: 1, backgroundColor: "#1a1a1a" }}>
+            <Stack
+              screenOptions={{ headerShown: false, gestureEnabled: false }}
+            >
+              {loggedIn ? (
+                <Stack.Screen name="(app)/home" />
+              ) : (
+                <Stack.Screen name="(auth)/login" />
+              )}
+            </Stack>
+          </View>
+        </ApolloProvider>
+      </Provider>
+    </>
   );
 }
