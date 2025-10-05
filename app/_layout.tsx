@@ -28,7 +28,7 @@ import {
   Provider,
 } from "urql";
 
-const API_LINK = "http://192.168.137.202:5000/graphql";
+const API_LINK = "http://10.11.138.211:5000/graphql";
 
 const client = createClient({
   url: API_LINK,

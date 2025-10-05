@@ -50,13 +50,14 @@ const GET_ATTENDANCE_RECORD: TypedDocumentNode<
 const AttendanceRecord = () => {
   const { id } = useLocalSearchParams();
   const subject = useSubjectStore((state) => state.currentSubject);
-  let canMiss = 0;
   const user = useUserStore((state) => state.user);
   const accessToken = useAuthStore((state) => state.accessToken);
   const [attendanceRecordMap, setAttendanceRecordMap] = useState<
     Map<number, any>
   >(new Map());
   const [attendanceRecordStatus, setAttendanceRecordStatus] = useState(false);
+  const [missedContactHours, setMissedContactHours] = useState(0);
+  const [noOfBunkableContactHours, setNoofBunkableContactHours] = useState(0);
 
   const { data, error } = useQuery(GET_ATTENDANCE_RECORD, {
     variables: { rollNo: user?.rollNo ? user.rollNo : 0, subjectId: id },
@@ -120,17 +121,22 @@ const AttendanceRecord = () => {
       });
       setAttendanceRecordMap(attendanceRecord);
       setAttendanceRecordStatus(true);
-      canMiss = (subject ? subject.contactHoursPerWeek : 0) * 15 * 0.25;
-      canMiss =
-        canMiss -
-        (data.getAttendanceRecord.totalContactHours &&
-        data.getAttendanceRecord.attendedContactHours
+      setNoofBunkableContactHours(
+        (subject ? subject.contactHoursPerWeek : 0) * 15 * 0.25
+      );
+      setMissedContactHours(
+        data.getAttendanceRecord.attendedContactHours &&
+          data.getAttendanceRecord.totalContactHours
           ? data.getAttendanceRecord.totalContactHours -
-            data.getAttendanceRecord.attendedContactHours
-          : 0);
+              data.getAttendanceRecord.attendedContactHours
+          : 0
+      );
     }
     console.log(error);
   }, [data, error]);
+
+  //useEffect(() => {
+  //}, [totalContactHours])
 
   return (
     <SafeAreaView style={styles.container}>
@@ -205,9 +211,9 @@ const AttendanceRecord = () => {
           </View>
           <Text style={styles.attendanceNote}>
             You can miss{" "}
-            <Text
-              style={styles.attendanceHighlight}
-            >{`${canMiss} more classes`}</Text>{" "}
+            <Text style={styles.attendanceHighlight}>{`${
+              Math.floor(noOfBunkableContactHours) - missedContactHours
+            } more classes`}</Text>{" "}
             to maintain 75% attendance.
           </Text>
         </View>
