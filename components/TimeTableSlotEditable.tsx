@@ -28,7 +28,8 @@ const TimeTableSlotEditable = ({ periodCode, index, dayNumber }) => {
         onValueChange={(val) => {
           setSelectedSubject(val);
           let indexToBeChanged = (dayNumber - 1) * 8 + index;
-          changeSubject(indexToBeChanged, subjectNameMap[val]);
+          const newSubjectCode = val === "Free" ? "" : subjectNameMap[val];
+          changeSubject(indexToBeChanged, newSubjectCode);
         }}
         hideIcon={true}
       />

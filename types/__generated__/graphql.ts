@@ -220,6 +220,18 @@ export type RegisterUserOutput = {
   userName: Scalars['String']['output'];
 };
 
+export type GetSubjectDetailsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetSubjectDetailsQuery = { getSubjectDetails: Array<{ __typename: 'Subject', id: string, subjectCode: string, subjectTitle: string, contactHoursPerWeek: number }> };
+
+export type EditWeekTimeTableMutationVariables = Exact<{
+  input: EditWeekTimeTableDto;
+}>;
+
+
+export type EditWeekTimeTableMutation = { editWeekTimeTable: { __typename: 'Week', id: string, timeTable: Array<string>, saturdayStatus: number } };
+
 export type GetAttendanceRecordQueryVariables = Exact<{
   rollNo: Scalars['Float']['input'];
   subjectId: Scalars['String']['input'];
@@ -227,11 +239,6 @@ export type GetAttendanceRecordQueryVariables = Exact<{
 
 
 export type GetAttendanceRecordQuery = { getAttendanceRecord: { __typename: 'Attendance', id: string, semesterId: string, studentRollNo: number, subjectId: string, totalContactHours: number, attendedContactHours: number, attendancePercentage: number, attendanceRecords: Array<{ __typename: 'AttendanceRecord', date: Date, periods: Array<number>, monthNumber: number, isUpdated: boolean, attended: Array<boolean> }> } };
-
-export type GetSubjectDetailsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetSubjectDetailsQuery = { getSubjectDetails: Array<{ __typename: 'Subject', id: string, subjectCode: string, subjectTitle: string, contactHoursPerWeek: number }> };
 
 export type GetUserQueryVariables = Exact<{
   token: Scalars['String']['input'];

@@ -4,13 +4,16 @@ import { useAuthStore } from "@/stores/auth.store";
 import { useSubjectStore } from "@/stores/subject.store";
 import { useTimeTableStore } from "@/stores/timeTable.store";
 import {
+  EditWeekTimeTableMutation,
+  EditWeekTimeTableMutationVariables,
   GetSubjectDetailsQuery,
   GetSubjectDetailsQueryVariables,
 } from "@/types/__generated__/graphql";
 import { dayMapFull } from "@/types/helpers";
 import { gql, TypedDocumentNode } from "@apollo/client";
-import { useQuery } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -29,6 +32,19 @@ const GET_SUBJECT_DETAILS: TypedDocumentNode<
   }
 `;
 
+const EDIT_WEEK_TIMETABLE: TypedDocumentNode<
+  EditWeekTimeTableMutation,
+  EditWeekTimeTableMutationVariables
+> = gql`
+  mutation editWeekTimeTable($input: editWeekTimeTableDto!) {
+    editWeekTimeTable(input: $input) {
+      id
+      timeTable
+      saturdayStatus
+    }
+  }
+`;
+
 const EditTimeTable = () => {
   const [selectedDay, setSelectedDay] = useState("Monday");
   const [currDayTimeTable, setCurrDayTimeTable] = useState<string[]>([]);
@@ -37,6 +53,11 @@ const EditTimeTable = () => {
   const setSubjects = useSubjectStore((state) => state.setSubjects);
   const accessToken = useAuthStore((state) => state.accessToken);
   const timeTable = useTimeTableStore((state) => state.timeTable);
+  const setTimeTable = useTimeTableStore((state) => state.setTimeTable);
+  const ttId = useTimeTableStore((state) => state.id);
+  const setSaturdayStatus = useTimeTableStore(
+    (state) => state.setSaturdayStatus
+  );
 
   const { data } = useQuery(GET_SUBJECT_DETAILS, {
     context: {
@@ -46,11 +67,38 @@ const EditTimeTable = () => {
     },
   });
 
+  const [editTT, { data: newTTData, error: editTTError }] = useMutation(
+    EDIT_WEEK_TIMETABLE,
+    {
+      context: {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      },
+    }
+  );
+
+  const handleEditTimeTable = () => {
+    editTT({ variables: { input: { id: ttId, timeTable: timeTable } } });
+  };
+
   useEffect(() => {
     if (data) {
       setSubjects(data.getSubjectDetails);
     }
   }, [data, setSubjects]);
+
+  useEffect(() => {
+    if (newTTData) {
+      setTimeTable(newTTData.editWeekTimeTable.timeTable);
+      setSaturdayStatus(newTTData.editWeekTimeTable.saturdayStatus);
+      return;
+    }
+
+    if (editTTError) {
+      console.log(editTTError.message);
+    }
+  }, [newTTData, editTTError]);
 
   useEffect(() => {
     let chunkedPeriods = [];
@@ -83,13 +131,16 @@ const EditTimeTable = () => {
     <SafeAreaView style={{ ...styles.modalContainer }}>
       <View style={styles.headerContainer}>
         <Text style={styles.headerTitle}>TimeTable Editor</Text>
-        <TouchableOpacity style={styles.backIcon}>
+        <TouchableOpacity
+          style={styles.backIcon}
+          onPress={() => router.replace("/(app)/home")}
+        >
           <Ionicons name="close" size={25} color="white" />
         </TouchableOpacity>
       </View>
       <View
         style={{
-          marginTop: 20,
+          marginVertical: 20,
         }}
       >
         <CustomPicker
@@ -118,6 +169,12 @@ const EditTimeTable = () => {
           </View>
         </View>
       </View>
+      <TouchableOpacity
+        onPress={handleEditTimeTable}
+        style={styles.loginButton}
+      >
+        <Text style={styles.loginText}>Edit Attendance</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -146,6 +203,18 @@ const styles = StyleSheet.create({
     fontFamily: "DMSerifDisplay-Regular",
     fontSize: 26,
     color: "#19AA59",
+  },
+  loginButton: {
+    width: "100%",
+    paddingVertical: 13,
+    borderRadius: 8,
+    alignItems: "center",
+    backgroundColor: "#19aa59",
+  },
+  loginText: {
+    fontSize: 16,
+    color: "#fff",
+    fontFamily: "DMSerifDisplay-Regular",
   },
   backIcon: {
     height: 40,

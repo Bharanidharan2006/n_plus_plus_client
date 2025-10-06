@@ -100,11 +100,11 @@ const Home = () => {
   const refreshTokenStored = useAuthStore((state) => state.refreshToken);
   const setTokens = useAuthStore((state) => state.setTokens);
   const [week, setWeek] = useState<Week | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
   const setTimeTable = useTimeTableStore((state) => state.setTimeTable);
   const setSaturdayStatus = useTimeTableStore(
     (state) => state.setSaturdayStatus
   );
+  const setId = useTimeTableStore((state) => state.setId);
   const [attendanceReport, setAttendanceReport] = useState<
     {
       attendancePercentage: number;
@@ -179,6 +179,7 @@ const Home = () => {
       setWeek(weekData.getLatestWeek);
       setTimeTable(weekData.getLatestWeek.timeTable);
       setSaturdayStatus(weekData.getLatestWeek.saturdayStatus);
+      setId(weekData.getLatestWeek.id);
     }
     if (attendancePercentageData) {
       const modifiedAttendanceReport =
@@ -260,7 +261,7 @@ const Home = () => {
           </Text>
           <TouchableOpacity
             style={{
-              display: user && user.role === "Student" ? "flex" : "none",
+              display: user && user.role === "Representative" ? "flex" : "none",
             }}
             onPress={() => {
               router.navigate("/(app)/(rep)/edit_attendance");
