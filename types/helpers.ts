@@ -23,6 +23,15 @@ export const dayMap = {
   6: "Sat",
 };
 
+export const dayMapFull = new Map([
+  ["Monday", 1],
+  ["Tuesday", 2],
+  ["Wednesday", 3],
+  ["Thursday", 4],
+  ["Friday", 5],
+  ["Saturday", 6],
+]);
+
 export const subjectCodeMap: Record<string, string> = {
   CS23301: "SWE", // key: string, value: string
   CS23302: "DSA",

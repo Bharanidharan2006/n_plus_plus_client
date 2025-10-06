@@ -1,4 +1,5 @@
 import BarChart from "@/components/BarChart";
+import EditModal from "@/components/EditModal";
 import TimeTable from "@/components/TimeTable";
 import { useAuthStore } from "@/stores/auth.store";
 import { useUserStore } from "@/stores/user.store";
@@ -15,6 +16,7 @@ import {
 import { subjectCodeMap } from "@/types/helpers";
 import { TypedDocumentNode, gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
@@ -98,6 +100,7 @@ const Home = () => {
   const refreshTokenStored = useAuthStore((state) => state.refreshToken);
   const setTokens = useAuthStore((state) => state.setTokens);
   const [week, setWeek] = useState<Week | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
   const [attendanceReport, setAttendanceReport] = useState<
     {
       attendancePercentage: number;
@@ -216,6 +219,11 @@ const Home = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <EditModal
+        visible={isVisible}
+        setVisible={setIsVisible}
+        timetable={week?.timeTable}
+      />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <Text style={{ ...styles.title, color: "#fff" }}>Hi,</Text>
@@ -237,10 +245,27 @@ const Home = () => {
         >
           <Text style={styles.buttonText}>View Attendance Record</Text>
         </TouchableOpacity>
-
-        <Text style={{ ...styles.attendanceTitle, marginTop: 30 }}>
-          Week's Schedule:
-        </Text>
+        <View
+          style={{
+            alignItems: "center",
+            marginTop: 40,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+        >
+          <Text style={{ ...styles.attendanceTitle, flex: 0.75 }}>
+            Week's Schedule:
+          </Text>
+          <TouchableOpacity
+            style={{
+              display: user && user.role === "Student" ? "flex" : "none",
+            }}
+            onPress={() => setIsVisible(true)}
+          >
+            <MaterialIcons name="edit" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
         {week ? (
           <TimeTable timeTable={week?.timeTable} />
         ) : (
@@ -275,7 +300,6 @@ const styles = StyleSheet.create({
   attendanceTitle: {
     fontFamily: "Poppins-Medium",
     fontSize: 20,
-    marginTop: 20,
     color: "#fff",
   },
 });

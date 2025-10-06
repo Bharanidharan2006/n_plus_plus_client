@@ -212,7 +212,9 @@ const AttendanceRecord = () => {
           <Text style={styles.attendanceNote}>
             You can miss{" "}
             <Text style={styles.attendanceHighlight}>{`${
-              Math.floor(noOfBunkableContactHours) - missedContactHours
+              Math.floor(noOfBunkableContactHours) - missedContactHours < 0
+                ? "no more"
+                : Math.floor(noOfBunkableContactHours) - missedContactHours
             } more classes`}</Text>{" "}
             to maintain 75% attendance.
           </Text>
