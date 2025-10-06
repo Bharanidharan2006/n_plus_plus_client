@@ -1,5 +1,8 @@
+import CustomPicker from "@/components/Picker";
+import TimeTableSlotEditable from "@/components/TimeTableSlotEditable";
 import { useAuthStore } from "@/stores/auth.store";
 import { useSubjectStore } from "@/stores/subject.store";
+import { useTimeTableStore } from "@/stores/timeTable.store";
 import {
   GetSubjectDetailsQuery,
   GetSubjectDetailsQueryVariables,
@@ -11,8 +14,6 @@ import Ionicons from "@expo/vector-icons/build/Ionicons";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CustomPicker from "./Picker";
-import TimeTableSlotEditable from "./TimeTableSlotEditable";
 
 const GET_SUBJECT_DETAILS: TypedDocumentNode<
   GetSubjectDetailsQuery,
@@ -28,19 +29,16 @@ const GET_SUBJECT_DETAILS: TypedDocumentNode<
   }
 `;
 
-const EditModal = ({ visible, setVisible, timetable }) => {
+const EditTimeTable = () => {
   const [selectedDay, setSelectedDay] = useState("Monday");
-  const [dayNumber, setDayNumber] = useState("Monday");
-  const [currDayTimeTable, setCurrDayTimeTable] = useState([]);
+  const [currDayTimeTable, setCurrDayTimeTable] = useState<string[]>([]);
+  const [chunks, setChunks] = useState<string[][]>();
   const subjects = useSubjectStore((state) => state.subjects);
   const setSubjects = useSubjectStore((state) => state.setSubjects);
   const accessToken = useAuthStore((state) => state.accessToken);
-  let chunkedPeriods = [];
-  for (let i = 0; i < timetable.length; i += 8) {
-    chunkedPeriods.push(timetable.slice(i, i + 8));
-  }
+  const timeTable = useTimeTableStore((state) => state.timeTable);
 
-  const { data, error } = useQuery(GET_SUBJECT_DETAILS, {
+  const { data } = useQuery(GET_SUBJECT_DETAILS, {
     context: {
       headers: {
         authorization: `Bearer ${accessToken}`,
@@ -49,25 +47,43 @@ const EditModal = ({ visible, setVisible, timetable }) => {
   });
 
   useEffect(() => {
-    setCurrDayTimeTable(chunkedPeriods[0]);
-  }, []);
-
-  useEffect(() => {
     if (data) {
       setSubjects(data.getSubjectDetails);
     }
-  }, [data]);
+  }, [data, setSubjects]);
+
+  useEffect(() => {
+    let chunkedPeriods = [];
+    for (let i = 0; i < timeTable.length; i += 8) {
+      chunkedPeriods.push(timeTable.slice(i, i + 8));
+    }
+    setChunks(chunkedPeriods);
+  }, [timeTable]);
+
+  useEffect(() => {
+    const dayNumber = dayMapFull.get(selectedDay) ?? 1;
+    if (!chunks || chunks.length === 0) {
+      setCurrDayTimeTable(Array(8).fill(""));
+      return;
+    }
+    const chunk = chunks[dayNumber - 1];
+    // if (!chunk) {
+    //   setCurrDayTimeTable(Array(8).fill(""));
+    //   return;
+    // }
+    // const filled =
+    //   chunk.length === 8
+    //     ? chunk
+    //     : [...chunk, ...Array(8 - chunk.length).fill("")];
+    setCurrDayTimeTable(chunk);
+    //console.log(currDayTimeTable);
+  }, [selectedDay, chunks]);
 
   return (
-    <SafeAreaView
-      style={{ ...styles.modalContainer, display: visible ? "flex" : "none" }}
-    >
+    <SafeAreaView style={{ ...styles.modalContainer }}>
       <View style={styles.headerContainer}>
         <Text style={styles.headerTitle}>TimeTable Editor</Text>
-        <TouchableOpacity
-          style={styles.backIcon}
-          onPress={() => setVisible(false)}
-        >
+        <TouchableOpacity style={styles.backIcon}>
           <Ionicons name="close" size={25} color="white" />
         </TouchableOpacity>
       </View>
@@ -86,17 +102,18 @@ const EditModal = ({ visible, setVisible, timetable }) => {
             { label: "Saturday", value: "Saturday" },
           ]}
           selectedValue={selectedDay}
-          onValueChange={(val, idx) => {
-            setSelectedDay(val);
-            setDayNumber(dayMapFull[selectedDay]);
-          }}
+          onValueChange={(val) => setSelectedDay(val)}
           hideIcon={false}
-          //placeholder="Choose fruit"
         />
         <View style={styles.dayContainer}>
           <View style={styles.timeTableRow}>
             {currDayTimeTable.map((period, i) => (
-              <TimeTableSlotEditable key={i} period={period} />
+              <TimeTableSlotEditable
+                key={`${selectedDay}-${i}-${Math.random() * 150}`}
+                index={i}
+                dayNumber={dayMapFull.get(selectedDay)}
+                periodCode={period}
+              />
             ))}
           </View>
         </View>
@@ -105,7 +122,7 @@ const EditModal = ({ visible, setVisible, timetable }) => {
   );
 };
 
-export default EditModal;
+export default EditTimeTable;
 
 const styles = StyleSheet.create({
   modalContainer: {
@@ -117,11 +134,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    //alignItems: "center",
-    //justifyContent: "center",
     padding: 20,
-    // height: "100%",
-    // width: "100%",
   },
   headerContainer: {
     flexDirection: "row",

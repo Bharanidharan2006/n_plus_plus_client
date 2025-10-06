@@ -1,7 +1,7 @@
 import BarChart from "@/components/BarChart";
-import EditModal from "@/components/EditModal";
 import TimeTable from "@/components/TimeTable";
 import { useAuthStore } from "@/stores/auth.store";
+import { useTimeTableStore } from "@/stores/timeTable.store";
 import { useUserStore } from "@/stores/user.store";
 import {
   GetAttendancePercentageQuery,
@@ -101,6 +101,10 @@ const Home = () => {
   const setTokens = useAuthStore((state) => state.setTokens);
   const [week, setWeek] = useState<Week | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const setTimeTable = useTimeTableStore((state) => state.setTimeTable);
+  const setSaturdayStatus = useTimeTableStore(
+    (state) => state.setSaturdayStatus
+  );
   const [attendanceReport, setAttendanceReport] = useState<
     {
       attendancePercentage: number;
@@ -173,6 +177,8 @@ const Home = () => {
     }
     if (weekData) {
       setWeek(weekData.getLatestWeek);
+      setTimeTable(weekData.getLatestWeek.timeTable);
+      setSaturdayStatus(weekData.getLatestWeek.saturdayStatus);
     }
     if (attendancePercentageData) {
       const modifiedAttendanceReport =
@@ -219,11 +225,6 @@ const Home = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <EditModal
-        visible={isVisible}
-        setVisible={setIsVisible}
-        timetable={week?.timeTable}
-      />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <Text style={{ ...styles.title, color: "#fff" }}>Hi,</Text>
@@ -261,7 +262,9 @@ const Home = () => {
             style={{
               display: user && user.role === "Student" ? "flex" : "none",
             }}
-            onPress={() => setIsVisible(true)}
+            onPress={() => {
+              router.navigate("/(app)/(rep)/edit_attendance");
+            }}
           >
             <MaterialIcons name="edit" size={24} color="white" />
           </TouchableOpacity>
