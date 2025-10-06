@@ -42,3 +42,14 @@ export const subjectCodeMap: Record<string, string> = {
   CS23S01: "SDC",
   UC23U01: "UHV",
 };
+
+export const subjectNameMap: Record<string, string> = {
+  SWE: "CS23301",
+  DSA: "CS23302",
+  DSD: "CS23303",
+  Java: "CS23304",
+  Math: "MA23C05",
+  Stds: "CS23U01",
+  SDC: "CS23S01",
+  UHV: "UC23U01",
+};
