@@ -1,3 +1,5 @@
+import { SaturdayStatus } from "@/stores/timeTable.store";
+
 export const monthMap: { [key: number]: string } = {
   0: "January",
   1: "February",
@@ -30,6 +32,24 @@ export const dayMapFull = new Map([
   ["Thursday", 4],
   ["Friday", 5],
   ["Saturday", 6],
+]);
+
+export const saturdayOrderMap = new Map([
+  [1, "Monday"],
+  [2, "Tuesday"],
+  [3, "Wednesday"],
+  [4, "Thursday"],
+  [5, "Friday"],
+  [0, "Leave"],
+]);
+
+export const saturdayOrderMapReverse = new Map([
+  ["Monday", SaturdayStatus.Monday],
+  ["Tuesday", SaturdayStatus.Tuesday],
+  ["Wednesday", SaturdayStatus.Wednesday],
+  ["Thursday", SaturdayStatus.Thursday],
+  ["Friday", SaturdayStatus.Friday],
+  ["Leave", SaturdayStatus.Leave],
 ]);
 
 export const subjectCodeMap: Record<string, string> = {

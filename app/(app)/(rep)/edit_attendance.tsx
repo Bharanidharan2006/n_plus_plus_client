@@ -2,14 +2,18 @@ import CustomPicker from "@/components/Picker";
 import TimeTableSlotEditable from "@/components/TimeTableSlotEditable";
 import { useAuthStore } from "@/stores/auth.store";
 import { useSubjectStore } from "@/stores/subject.store";
-import { useTimeTableStore } from "@/stores/timeTable.store";
+import { SaturdayStatus, useTimeTableStore } from "@/stores/timeTable.store";
 import {
   EditWeekTimeTableMutation,
   EditWeekTimeTableMutationVariables,
   GetSubjectDetailsQuery,
   GetSubjectDetailsQueryVariables,
 } from "@/types/__generated__/graphql";
-import { dayMapFull } from "@/types/helpers";
+import {
+  dayMapFull,
+  saturdayOrderMap,
+  saturdayOrderMapReverse,
+} from "@/types/helpers";
 import { gql, TypedDocumentNode } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
@@ -48,6 +52,8 @@ const EDIT_WEEK_TIMETABLE: TypedDocumentNode<
 const EditTimeTable = () => {
   const [selectedDay, setSelectedDay] = useState("Monday");
   const [currDayTimeTable, setCurrDayTimeTable] = useState<string[]>([]);
+  const saturdayStatus = useTimeTableStore((state) => state.saturdayStatus);
+  const [selectedSaturdayOrder, setSelectedSaturdayOrder] = useState("Leave");
   const [chunks, setChunks] = useState<string[][]>();
   const subjects = useSubjectStore((state) => state.subjects);
   const setSubjects = useSubjectStore((state) => state.setSubjects);
@@ -79,7 +85,15 @@ const EditTimeTable = () => {
   );
 
   const handleEditTimeTable = () => {
-    editTT({ variables: { input: { id: ttId, timeTable: timeTable } } });
+    editTT({
+      variables: {
+        input: {
+          id: ttId,
+          timeTable: timeTable,
+          saturdayStatus: saturdayStatus,
+        },
+      },
+    });
   };
 
   useEffect(() => {
@@ -109,7 +123,12 @@ const EditTimeTable = () => {
   }, [timeTable]);
 
   useEffect(() => {
+    setSelectedSaturdayOrder(saturdayOrderMap.get(saturdayStatus) ?? "");
+  }, [saturdayStatus]);
+
+  useEffect(() => {
     const dayNumber = dayMapFull.get(selectedDay) ?? 1;
+    //if (dayNumber === 6 && saturdayStatus === SaturdayStatus.Leave) return;
     if (!chunks || chunks.length === 0) {
       setCurrDayTimeTable(Array(8).fill(""));
       return;
@@ -125,7 +144,7 @@ const EditTimeTable = () => {
     //     : [...chunk, ...Array(8 - chunk.length).fill("")];
     setCurrDayTimeTable(chunk);
     //console.log(currDayTimeTable);
-  }, [selectedDay, chunks]);
+  }, [selectedDay, chunks, selectedSaturdayOrder, timeTable]);
 
   return (
     <SafeAreaView style={{ ...styles.modalContainer }}>
@@ -158,14 +177,71 @@ const EditTimeTable = () => {
         />
         <View style={styles.dayContainer}>
           <View style={styles.timeTableRow}>
-            {currDayTimeTable.map((period, i) => (
-              <TimeTableSlotEditable
-                key={`${selectedDay}-${i}-${Math.random() * 150}`}
-                index={i}
-                dayNumber={dayMapFull.get(selectedDay)}
-                periodCode={period}
-              />
-            ))}
+            {selectedDay !== "Saturday" && currDayTimeTable ? (
+              currDayTimeTable.map((period, i) => (
+                <TimeTableSlotEditable
+                  key={`${selectedDay}-${i}-${Math.random() * 150}`}
+                  index={i}
+                  dayNumber={dayMapFull.get(selectedDay)}
+                  periodCode={period}
+                />
+              ))
+            ) : (
+              <>
+                <CustomPicker
+                  items={[
+                    { label: "Monday", value: "Monday" },
+                    { label: "Tuesday", value: "Tuesday" },
+                    { label: "Wednesday", value: "Wednesday" },
+                    { label: "Thursday", value: "Thursday" },
+                    { label: "Friday", value: "Friday" },
+                    { label: "Leave", value: "Leave" },
+                  ]}
+                  selectedValue={selectedSaturdayOrder}
+                  onValueChange={(val) => {
+                    if (
+                      val === "Leave" &&
+                      saturdayStatus === SaturdayStatus.Leave
+                    )
+                      return;
+                    let prevSaturdayStatus = saturdayOrderMapReverse.get(val);
+
+                    setSaturdayStatus(saturdayOrderMapReverse.get(val));
+                    if (val === "Leave" && timeTable.length > 40) {
+                      let newTimeTable = [...timeTable];
+                      newTimeTable = newTimeTable.slice(0, 40);
+                      setTimeTable(newTimeTable);
+                    } else if (prevSaturdayStatus > 0) {
+                      const saturdayOrder = chunks[dayMapFull.get(val) - 1];
+                      let newTimeTable = [...timeTable];
+                      newTimeTable = newTimeTable.slice(0, 40);
+                      newTimeTable = [...newTimeTable, ...saturdayOrder];
+                      setTimeTable(newTimeTable);
+                    } else {
+                      let newTimeTable = [...timeTable];
+                      const saturdayOrder = chunks[dayMapFull.get(val) - 1];
+                      newTimeTable = [...newTimeTable, ...saturdayOrder];
+                      setTimeTable(newTimeTable);
+                    }
+                  }}
+                  hideIcon={false}
+                />
+                {selectedSaturdayOrder !== "Leave" && timeTable ? (
+                  timeTable
+                    .slice(40, 48)
+                    .map((period, i) => (
+                      <TimeTableSlotEditable
+                        key={`${selectedDay}-${i}-${Math.random() * 150}`}
+                        index={i}
+                        dayNumber={6}
+                        periodCode={period}
+                      />
+                    ))
+                ) : (
+                  <></>
+                )}
+              </>
+            )}
           </View>
         </View>
       </View>

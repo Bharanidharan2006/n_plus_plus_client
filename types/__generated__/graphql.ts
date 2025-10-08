@@ -198,6 +198,7 @@ export type CreateWeekTimeTableDto = {
 
 export type EditWeekTimeTableDto = {
   id: Scalars['String']['input'];
+  saturdayStatus: Scalars['Float']['input'];
   timeTable: Array<Scalars['String']['input']>;
 };
 

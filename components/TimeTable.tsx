@@ -2,7 +2,14 @@ import DayTimeTable from "@/components/DayTimeTable";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-const day = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+const day = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 const TimeTable = ({ timeTable: periods }) => {
   const chunkedPeriods = [];

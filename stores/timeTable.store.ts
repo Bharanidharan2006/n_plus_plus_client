@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
-enum SaturdayStatus {
-  Leave,
+export enum SaturdayStatus {
+  Leave = 0,
   Monday,
   Tuesday,
   Wednesday,
@@ -23,7 +23,9 @@ export const useTimeTableStore = create<TimeTableStore>((set) => ({
   timeTable: ["", "", "", "", "", "", "", ""],
   id: "",
   saturdayStatus: SaturdayStatus.Leave,
-  setTimeTable: (tt: string[]) => set({ timeTable: tt }),
+  setTimeTable: (tt: string[]) => {
+    set({ timeTable: tt });
+  },
   changeSubject: (index: number, newSubjectCode: string) =>
     set((state) => {
       const tt = [...state.timeTable];
