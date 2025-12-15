@@ -68,35 +68,6 @@ const AttendanceRecord = () => {
     },
   });
 
-  // Temporary history list
-  const history = [
-    {
-      id: 1,
-      date: "Tue, 21",
-      detail: "2 hours attended",
-      status: ["check", "check"],
-    },
-    { id: 2, date: "Wed, 22", detail: "1 hour missed", status: ["cancel"] },
-    {
-      id: 3,
-      date: "Thu, 23",
-      detail: "Periods: 5, 6, 7, 8",
-      status: ["check", "check", "check", "check"],
-    },
-    {
-      id: 4,
-      date: "Tue, 21",
-      detail: "2 hours attended",
-      status: ["check", "check"],
-    },
-    {
-      id: 5,
-      date: "Tue, 21",
-      detail: "2 hours attended",
-      status: ["check", "check"],
-    },
-  ];
-
   useEffect(() => {
     const attendanceRecord = new Map();
     if (data?.getAttendanceRecord?.attendanceRecords) {
@@ -135,9 +106,6 @@ const AttendanceRecord = () => {
     console.log(error);
   }, [data, error]);
 
-  //useEffect(() => {
-  //}, [totalContactHours])
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
@@ -145,10 +113,7 @@ const AttendanceRecord = () => {
           <Text style={styles.subjectTitle}>{subject?.subjectTitle}</Text>
           <Text style={styles.subjectCode}>{`(${subject?.subjectCode})`}</Text>
         </View>
-        <TouchableOpacity
-          style={styles.backIcon}
-          onPress={() => router.navigate("/(app)/attendance")}
-        >
+        <TouchableOpacity style={styles.backIcon} onPress={() => router.back()}>
           <Ionicons
             name="chevron-back"
             size={25}

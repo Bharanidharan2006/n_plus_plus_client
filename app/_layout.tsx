@@ -15,11 +15,10 @@ import {
   Poppins_800ExtraBold,
   useFonts as usePoppins,
 } from "@expo-google-fonts/poppins";
-import { Stack } from "expo-router";
+import { Stack, useNavigation } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
 import {
   cacheExchange,
   createClient,
@@ -28,7 +27,9 @@ import {
   Provider,
 } from "urql";
 
-const API_LINK = "http://10.0.2.2:5000/graphql";
+const API_LINK = process.env.EXPO_PUBLIC_API_LINK || "";
+
+console.log(API_LINK);
 
 const client = createClient({
   url: API_LINK,
@@ -49,6 +50,7 @@ const apolloClient = new ApolloClient({
 
 export default function RootLayout() {
   const setTokens = useAuthStore((state) => state.setTokens);
+  const navigator = useNavigation();
   const [loggedIn, setLoggedIn] = useState(false);
   const [dmLoaded] = useDmSerif({
     "DMSerifDisplay-Regular": DMSerifDisplay_400Regular,
@@ -81,17 +83,19 @@ export default function RootLayout() {
       <StatusBar backgroundColor="#1d1d1d" translucent={false} style="light" />
       <Provider value={client}>
         <ApolloProvider client={apolloClient}>
-          <View style={{ flex: 1, backgroundColor: "#1a1a1a" }}>
-            <Stack
-              screenOptions={{ headerShown: false, gestureEnabled: false }}
-            >
-              {loggedIn ? (
-                <Stack.Screen name="(app)/home" />
-              ) : (
-                <Stack.Screen name="(auth)/login" />
-              )}
-            </Stack>
-          </View>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Protected guard={loggedIn}>
+              <Stack.Screen name="(app)" />
+            </Stack.Protected>
+            <Stack.Protected guard={!loggedIn}>
+              <Stack.Screen name="login" />
+              <Stack.Screen name="forgot_password" />
+            </Stack.Protected>
+          </Stack>
         </ApolloProvider>
       </Provider>
     </>

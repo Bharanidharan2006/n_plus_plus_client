@@ -150,10 +150,7 @@ const EditTimeTable = () => {
     <SafeAreaView style={{ ...styles.modalContainer }}>
       <View style={styles.headerContainer}>
         <Text style={styles.headerTitle}>TimeTable Editor</Text>
-        <TouchableOpacity
-          style={styles.backIcon}
-          onPress={() => router.replace("/(app)/home")}
-        >
+        <TouchableOpacity style={styles.backIcon} onPress={() => router.back()}>
           <Ionicons name="close" size={25} color="white" />
         </TouchableOpacity>
       </View>

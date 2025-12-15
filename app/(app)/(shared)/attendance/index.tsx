@@ -64,10 +64,7 @@ const Attendance = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.headerTitle}>Attendance Record</Text>
-        <TouchableOpacity
-          style={styles.backIcon}
-          onPress={() => router.navigate("/(app)/home")}
-        >
+        <TouchableOpacity style={styles.backIcon} onPress={() => router.back()}>
           <Ionicons
             name="chevron-back"
             size={25}
