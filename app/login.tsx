@@ -70,7 +70,7 @@ export default function Login() {
       await SecureStore.setItemAsync("accessToken", accessToken);
       await SecureStore.setItemAsync("refreshToken", refreshToken);
 
-      router.replace("/(app)/home");
+      router.replace("/");
       setErrorMessage("");
     } else if (response.error) {
       console.error("Login failed", response.error);
@@ -137,7 +137,7 @@ export default function Login() {
               <TouchableOpacity
                 touchSoundDisabled={false}
                 style={styles.forgotWrapper}
-                onPress={() => router.replace("/(auth)/forget_password")}
+                onPress={() => router.replace("/forgot_password")}
               >
                 <Text style={styles.forgotText}>Forgot Password?</Text>
               </TouchableOpacity>
@@ -154,7 +154,7 @@ export default function Login() {
           {!keyboardVisible && (
             <View style={styles.iconWrapper}>
               <Image
-                source={require("../../assets/images/logo.png")}
+                source={require("../assets/images/logo.png")}
                 style={{ width: 20, height: 20 }}
                 resizeMode="contain"
               />

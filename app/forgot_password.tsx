@@ -162,7 +162,7 @@ export default function ForgotPassword() {
               <TouchableOpacity
                 touchSoundDisabled={false}
                 style={styles.forgotWrapper}
-                onPress={() => router.replace("/(auth)/login")}
+                onPress={() => router.replace("/login")}
               >
                 <Text style={styles.forgotText}>Go to Login</Text>
               </TouchableOpacity>
@@ -172,7 +172,7 @@ export default function ForgotPassword() {
           {/* Logo at the bottom */}
           <View style={styles.iconWrapper}>
             <Image
-              source={require("../../assets/images/logo.png")}
+              source={require("../assets/images/logo.png")}
               style={{ width: 20, height: 20 }}
               resizeMode="contain"
             />
