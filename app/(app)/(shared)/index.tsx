@@ -243,7 +243,7 @@ const Home = () => {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.navigate("/(app)/(shared)/attendance/")}
+          onPress={() => router.push("/(app)/(shared)/attendance/")}
         >
           <Text style={styles.buttonText}>View Attendance Record</Text>
         </TouchableOpacity>
@@ -264,7 +264,7 @@ const Home = () => {
               display: user && user.role === "Representative" ? "flex" : "none",
             }}
             onPress={() => {
-              router.navigate("/(app)/rep/timetable/edit_timetable");
+              router.push("/(app)/rep/timetable/edit_timetable");
             }}
           >
             <MaterialIcons name="edit" size={24} color="white" />
