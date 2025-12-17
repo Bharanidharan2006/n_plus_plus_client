@@ -4,7 +4,7 @@ import {
 } from "@/graphql_interfaces/auth.interface";
 import { MaterialIcons } from "@expo/vector-icons";
 import { gql } from "@urql/core";
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
 import {
@@ -150,6 +150,8 @@ export default function Login() {
               </TouchableOpacity>
             </View>
           </View>
+
+          <Link href={"/pd"}>Go to pending attendance</Link>
 
           {!keyboardVisible && (
             <View style={styles.iconWrapper}>
