@@ -9,6 +9,7 @@ type User = {
   currentSemester: number;
   role: string;
   refreshTokenVersion: number;
+  phone:number;
 };
 
 type UserStore = {
