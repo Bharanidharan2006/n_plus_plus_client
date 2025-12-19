@@ -39,7 +39,7 @@ const GET_SUBJECT_DETAILS: TypedDocumentNode<
   }
 `;
 
-const Attendance = () => {
+const ChooseSubject = () => {
   const router = useRouter();
   const accessToken = useAuthStore((state) => state.accessToken);
   const [subjectDetails, setSubjectDetails] = useState<SubjectDetail[]>([]);
@@ -116,4 +116,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Attendance;
+export default ChooseSubject;

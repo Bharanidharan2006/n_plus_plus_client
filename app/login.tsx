@@ -70,7 +70,7 @@ export default function Login() {
       await SecureStore.setItemAsync("accessToken", accessToken);
       await SecureStore.setItemAsync("refreshToken", refreshToken);
 
-      router.replace("/");
+      router.replace("/(tabs)/(home)");
       setErrorMessage("");
     } else if (response.error) {
       console.error("Login failed", response.error);

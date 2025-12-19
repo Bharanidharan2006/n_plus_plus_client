@@ -1,21 +1,29 @@
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { push } from "expo-router/build/global-state/routing";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const PendingAttendanceSlot = ({ date }) => {
+  const dateInMMDDYYYY: string = date
+    .toLocaleDateString("en-GB")
+    .replace(/\//g, "-");
   return (
-    <View style={styles.slotElement}>
-      {/* en-GB gives the date in dd/mm/yyyy and the regex replaces '/' with '-' */}
-      <Text style={styles.slotElementText}>
-        {date.toLocaleDateString("en-GB").replace(/\//g, "-")}
-      </Text>
-    </View>
+    <TouchableOpacity
+      onPress={() => push(`/(tabs)/attendance/mark/${dateInMMDDYYYY}`)}
+    >
+      <View style={styles.slotElement}>
+        {/* en-GB gives the date in dd/mm/yyyy and the regex replaces '/' with '-' */}
+        <Text style={styles.slotElementText}>{dateInMMDDYYYY}</Text>
+      </View>
+    </TouchableOpacity>
   );
 };
 
 const PendingAttendanceIndex = () => {
+  const tabBarHeight = useBottomTabBarHeight();
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { paddingBottom: tabBarHeight }]}>
       <Text style={styles.pageTitle}>Pending Attendance Updates</Text>
       <View style={styles.slotContainer}>
         <TouchableOpacity>

@@ -9,12 +9,12 @@ const parseDate = (date: any) => {
   return new Date(yyyy, mm - 1, dd);
 };
 
-const pd = () => {
+const UpdatePendingAttendance = () => {
   const { date } = useLocalSearchParams();
-  const dateObj = parseDate("15-12-2025");
+  const dateObj = parseDate(date);
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.pageTitle}>{dateObj.toUTCString()}</Text>
+      <Text style={styles.pageTitle}>{date}</Text>
       <DayTimeTableUpdate
         periods={["", "CS23301", "CS23301", "CS23302", "", "", "", "CS23304"]}
         day={"Monday"}
@@ -102,4 +102,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default pd;
+export default UpdatePendingAttendance;

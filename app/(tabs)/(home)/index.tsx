@@ -17,6 +17,7 @@ import { subjectCodeMap } from "@/types/helpers";
 import { TypedDocumentNode, gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
@@ -93,6 +94,7 @@ export const GET_ATTENDANCE_PERCENTAGE: TypedDocumentNode<
 `;
 
 const Home = () => {
+  const tabBarHeight = useBottomTabBarHeight();
   const router = useRouter();
   const setUser = useUserStore((state) => state.setUser);
   const user = useUserStore((state) => state.user);
@@ -225,7 +227,7 @@ const Home = () => {
   // if (fetching) return null;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { paddingBottom: tabBarHeight }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <Text style={{ ...styles.title, color: "#fff" }}>Hi,</Text>
@@ -285,7 +287,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1D1D1D",
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingTop: 20,
   },
   title: { fontFamily: "DMSerifDisplay-Regular", fontSize: 30 },
   button: {
