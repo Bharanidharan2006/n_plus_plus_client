@@ -44,6 +44,7 @@ export const GET_USER: TypedDocumentNode<
       role
       refreshTokenVersion
       createdAt
+      pendingDates
     }
   }
 `;

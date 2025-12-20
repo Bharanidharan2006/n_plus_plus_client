@@ -1,20 +1,23 @@
 import { subjectCodeMap } from "@/types/helpers";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const TimeTableSlot = ({ period, pno }) => {
-  const [bgColor, setBgColor] = useState("#1A1A1A");
+const TimeTableSlot = ({ period, pno, setAttendance, attendance }) => {
+  const [bgColor, setBgColor] = useState("#19AA59");
   const [color, setColor] = useState("#fff");
 
   const nextColorStatus = () => {
-    if (bgColor === "#1A1A1A") {
-      setBgColor("#19AA59");
-      setColor("#fff");
-    } else if (bgColor === "#19AA59") {
+    if (bgColor === "#19AA59") {
+      attendance[pno - 1] = false;
+      let newAttd = Array.from(attendance);
+      setAttendance(newAttd);
       setBgColor("#fff");
       setColor("#000");
     } else {
-      setBgColor("#1A1A1A");
+      attendance[pno - 1] = true;
+      let newAttd = Array.from(attendance);
+      setAttendance(newAttd);
+      setBgColor("#19AA59");
       setColor("#fff");
     }
   };
@@ -22,10 +25,18 @@ const TimeTableSlot = ({ period, pno }) => {
   return (
     <TouchableOpacity
       disabled={period === ""}
-      style={[styles.ttSlotContainer, { backgroundColor: bgColor }]}
+      style={[
+        styles.ttSlotContainer,
+        { backgroundColor: period === "" ? "#1A1A1A" : bgColor },
+      ]}
       onPress={() => nextColorStatus()}
     >
-      <Text style={[styles.timeTableSlotText, { color: color }]}>
+      <Text
+        style={[
+          styles.timeTableSlotText,
+          { color: period === "" ? "#fff" : color },
+        ]}
+      >
         {pno + " - "}
         {period ? subjectCodeMap[period] : "Free"}
       </Text>
@@ -33,7 +44,12 @@ const TimeTableSlot = ({ period, pno }) => {
   );
 };
 
-const DayTimeTableUpdate = ({ periods, day }) => {
+const DayTimeTableUpdate = ({ periods, day, updateAttendance }) => {
+  const [attendance, setAttendance] = useState<boolean[]>(Array(8).fill(true));
+  useEffect(() => {
+    updateAttendance(attendance);
+  }, [attendance]);
+
   return (
     <View style={styles.dayContainer}>
       <Text
@@ -43,7 +59,15 @@ const DayTimeTableUpdate = ({ periods, day }) => {
       </Text>
       <View style={styles.timeTableRow}>
         {periods.map((period, i) => {
-          return <TimeTableSlot period={period} key={i} pno={i + 1} />;
+          return (
+            <TimeTableSlot
+              period={period}
+              key={i}
+              pno={i + 1}
+              setAttendance={setAttendance}
+              attendance={attendance}
+            />
+          );
         })}
       </View>
     </View>

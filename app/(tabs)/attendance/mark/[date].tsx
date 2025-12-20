@@ -1,25 +1,122 @@
 import DayTimeTableUpdate from "@/components/DayTimeTableUpdate";
-import { useLocalSearchParams } from "expo-router";
-import React from "react";
+import { useAuthStore } from "@/stores/auth.store";
+import { useUserStore } from "@/stores/user.store";
+import {
+  GetScheduleByDateQuery,
+  GetScheduleByDateQueryVariables,
+  UpdateDailyAttendanceMutation,
+  UpdateDailyAttendanceMutationVariables,
+} from "@/types/__generated__/graphql";
+import { dayMapFullInverse } from "@/types/helpers";
+import { gql, TypedDocumentNode } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const parseDate = (date: any) => {
+export const GET_SCHEDULE_BY_DATE: TypedDocumentNode<
+  GetScheduleByDateQuery,
+  GetScheduleByDateQueryVariables
+> = gql`
+  query GetScheduleByDate($date: DateTime!) {
+    getScheduleByDate(date: $date)
+  }
+`;
+
+export const UPDATE_DAILY_ATTENDANCE: TypedDocumentNode<
+  UpdateDailyAttendanceMutation,
+  UpdateDailyAttendanceMutationVariables
+> = gql`
+  mutation UpdateDailyAttendance($input: UpdateDailyAttendanceDto!) {
+    updateDailyAttendance(input: $input)
+  }
+`;
+
+const parseDate = (date: any): Date => {
   const [dd, mm, yyyy] = date.split("-").map(Number);
   return new Date(yyyy, mm - 1, dd);
 };
 
 const UpdatePendingAttendance = () => {
   const { date } = useLocalSearchParams();
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const user = useUserStore((state) => state.user);
+  const setUser = useUserStore((state) => state.setUser);
+  const [attendance, setAttendance] = useState<boolean[]>(Array(8).fill(true));
+  const [schedule, setSchedule] = useState<string[]>([]);
+  const { data, error } = useQuery(GET_SCHEDULE_BY_DATE, {
+    context: {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+    },
+    variables: {
+      date: parseDate(date),
+    },
+  });
   const dateObj = parseDate(date);
+  const [
+    updateAttendance,
+    { data: updateAttendanceResponse, error: updateAttendanceError },
+  ] = useMutation(UPDATE_DAILY_ATTENDANCE, {
+    context: {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+    },
+    variables: {
+      input: {
+        date: dateObj,
+        attendanceData: attendance,
+        rollno: user ? user.rollNo : 0,
+      },
+    },
+  });
+
+  useEffect(() => {
+    if (data) {
+      setSchedule(data.getScheduleByDate);
+    }
+  }, [data]);
+
+  const isSameDate = (dt1: any, dt2: Date) => {
+    const d1 = new Date(dt1);
+    return (
+      d1.getFullYear() === dt2.getFullYear() &&
+      d1.getMonth() === dt2.getMonth() &&
+      d1.getDate() === dt2.getDate()
+    );
+  };
+
+  const handleUpdateAttendance = () => {
+    updateAttendance()
+      .then((d) => {
+        if (d.data?.updateDailyAttendance === true) {
+          if (user) {
+            let newPendingDates = user.pendingDates.filter(
+              (d) => !isSameDate(d, dateObj)
+            );
+            setUser({ ...user, pendingDates: newPendingDates });
+          }
+        }
+      })
+      .catch((e) => console.log(e));
+    router.back();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.pageTitle}>{date}</Text>
       <DayTimeTableUpdate
-        periods={["", "CS23301", "CS23301", "CS23302", "", "", "", "CS23304"]}
-        day={"Monday"}
+        periods={schedule}
+        day={dayMapFullInverse.get(dateObj.getDay())}
+        updateAttendance={setAttendance}
       />
-      <TouchableOpacity style={styles.actionButton}>
+      <TouchableOpacity
+        style={styles.actionButton}
+        onPress={handleUpdateAttendance}
+      >
         <Text style={styles.actionButtonText}>Update Attendance</Text>
       </TouchableOpacity>
       <View style={styles.legendContainer}>

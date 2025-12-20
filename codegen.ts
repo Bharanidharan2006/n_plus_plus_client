@@ -2,7 +2,7 @@ import { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
   overwrite: true,
-  schema: "http://localhost:5000/graphql",
+  schema: "D:/n_plus_plus/src/schema.gql",
   // This assumes that all your source files are in a top-level `src/` directory - you might need to adjust this to your file structure
   documents: ["app/**/*.{ts,tsx}"],
   // Don't exit with non-zero status when there are no documents

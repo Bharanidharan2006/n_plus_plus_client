@@ -1,10 +1,12 @@
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useUserStore } from "@/stores/user.store";
 import { push } from "expo-router/build/global-state/routing";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const PendingAttendanceSlot = ({ date }) => {
+  console.log(date);
+
   const dateInMMDDYYYY: string = date
     .toLocaleDateString("en-GB")
     .replace(/\//g, "-");
@@ -21,17 +23,22 @@ const PendingAttendanceSlot = ({ date }) => {
 };
 
 const PendingAttendanceIndex = () => {
-  const tabBarHeight = useBottomTabBarHeight();
+  const user = useUserStore((state) => state.user);
+  console.log(user?.pendingDates);
+
   return (
-    <SafeAreaView style={[styles.container, { paddingBottom: tabBarHeight }]}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.pageTitle}>Pending Attendance Updates</Text>
       <View style={styles.slotContainer}>
-        <TouchableOpacity>
-          <PendingAttendanceSlot date={new Date()} />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <PendingAttendanceSlot date={new Date()} />
-        </TouchableOpacity>
+        {user?.pendingDates && user?.pendingDates.length == 0 ? (
+          <Text>You are up to date</Text>
+        ) : (
+          user?.pendingDates?.map((date) => (
+            <TouchableOpacity key={Math.random()}>
+              <PendingAttendanceSlot date={new Date(date)} />
+            </TouchableOpacity>
+          ))
+        )}
       </View>
     </SafeAreaView>
   );

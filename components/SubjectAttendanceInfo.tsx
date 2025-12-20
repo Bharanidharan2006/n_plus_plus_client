@@ -21,7 +21,7 @@ const SubjectAttendanceInfo = ({
           contactHoursPerWeek,
         };
         setCurentSubject(subject);
-        router.navigate(`/(app)/attendance/${id}`);
+        router.navigate(`/(tabs)/attendance/record/${id}`);
       }}
     >
       <Text style={styles.subjectTitle}>{subjectName + " "}</Text>

@@ -34,6 +34,15 @@ export const dayMapFull = new Map([
   ["Saturday", 6],
 ]);
 
+export const dayMapFullInverse = new Map([
+  [1, "Monday"],
+  [2, "Tuesday"],
+  [3, "Wednesday"],
+  [4, "Thursday"],
+  [5, "Friday"],
+  [6, "Saturday"],
+]);
+
 export const saturdayOrderMap = new Map([
   [1, "Monday"],
   [2, "Tuesday"],

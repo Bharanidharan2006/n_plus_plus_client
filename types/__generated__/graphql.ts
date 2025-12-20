@@ -12,6 +12,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
   DateTime: { input: Date; output: Date; }
 };
 
@@ -64,6 +65,7 @@ export type Mutation = {
   refreshToken: LoginResponse;
   registerUser: RegisterUserOutput;
   updateAttendance: Scalars['Boolean']['output'];
+  updateDailyAttendance: Scalars['Boolean']['output'];
 };
 
 
@@ -112,12 +114,18 @@ export type MutationUpdateAttendanceArgs = {
   input: UpdateAttendanceDto;
 };
 
+
+export type MutationUpdateDailyAttendanceArgs = {
+  input: UpdateDailyAttendanceDto;
+};
+
 export type Query = {
   __typename: 'Query';
   getAllWeeks: Array<Week>;
   getAttendancePercentage: Array<GetAttendancePercentageOutput>;
   getAttendanceRecord: Attendance;
   getLatestWeek: Week;
+  getScheduleByDate: Array<Scalars['String']['output']>;
   getSubjectDetails: Array<Subject>;
   getUser: User;
   methoddd: Scalars['Int']['output'];
@@ -132,6 +140,11 @@ export type QueryGetAttendancePercentageArgs = {
 export type QueryGetAttendanceRecordArgs = {
   rollNo: Scalars['Float']['input'];
   subjectId: Scalars['String']['input'];
+};
+
+
+export type QueryGetScheduleByDateArgs = {
+  date: Scalars['DateTime']['input'];
 };
 
 
@@ -157,6 +170,12 @@ export type UpdateAttendanceDto = {
   subjectCode: Scalars['String']['input'];
 };
 
+export type UpdateDailyAttendanceDto = {
+  attendanceData: Array<Scalars['Boolean']['input']>;
+  date: Scalars['DateTime']['input'];
+  rollno: Scalars['Float']['input'];
+};
+
 export type User = {
   __typename: 'User';
   createdAt: Maybe<Scalars['DateTime']['output']>;
@@ -165,6 +184,7 @@ export type User = {
   id: Scalars['String']['output'];
   masterPassword: Scalars['String']['output'];
   password: Maybe<Scalars['String']['output']>;
+  pendingDates: Array<Scalars['DateTime']['output']>;
   refreshTokenVersion: Scalars['Int']['output'];
   role: Scalars['String']['output'];
   rollNo: Scalars['Float']['output'];
@@ -215,6 +235,7 @@ export type RegisterUserOutput = {
   currentSemester: Scalars['Float']['output'];
   email: Scalars['String']['output'];
   id: Scalars['String']['output'];
+  pendingDates: Array<Scalars['DateTime']['output']>;
   refreshTokenVersion: Scalars['Int']['output'];
   role: Scalars['String']['output'];
   rollNo: Scalars['Float']['output'];
@@ -233,20 +254,12 @@ export type EditWeekTimeTableMutationVariables = Exact<{
 
 export type EditWeekTimeTableMutation = { editWeekTimeTable: { __typename: 'Week', id: string, timeTable: Array<string>, saturdayStatus: number } };
 
-export type GetAttendanceRecordQueryVariables = Exact<{
-  rollNo: Scalars['Float']['input'];
-  subjectId: Scalars['String']['input'];
-}>;
-
-
-export type GetAttendanceRecordQuery = { getAttendanceRecord: { __typename: 'Attendance', id: string, semesterId: string, studentRollNo: number, subjectId: string, totalContactHours: number, attendedContactHours: number, attendancePercentage: number, attendanceRecords: Array<{ __typename: 'AttendanceRecord', date: Date, periods: Array<number>, monthNumber: number, isUpdated: boolean, attended: Array<boolean> }> } };
-
 export type GetUserQueryVariables = Exact<{
   token: Scalars['String']['input'];
 }>;
 
 
-export type GetUserQuery = { getUser: { __typename: 'User', id: string, email: string, rollNo: number, userName: string, currentSemester: number, role: string, refreshTokenVersion: number, createdAt: Date | null } };
+export type GetUserQuery = { getUser: { __typename: 'User', id: string, email: string, rollNo: number, userName: string, currentSemester: number, role: string, refreshTokenVersion: number, createdAt: Date | null, pendingDates: Array<Date> } };
 
 export type RefreshTokenMutationVariables = Exact<{
   refreshToken: Scalars['String']['input'];
@@ -266,6 +279,28 @@ export type GetAttendancePercentageQueryVariables = Exact<{
 
 
 export type GetAttendancePercentageQuery = { getAttendancePercentage: Array<{ __typename: 'GetAttendancePercentageOutput', attendance: { __typename: 'Attendance', attendancePercentage: number }, subjectDetails: { __typename: 'Subject', subjectCode: string } }> };
+
+export type GetScheduleByDateQueryVariables = Exact<{
+  date: Scalars['DateTime']['input'];
+}>;
+
+
+export type GetScheduleByDateQuery = { getScheduleByDate: Array<string> };
+
+export type UpdateDailyAttendanceMutationVariables = Exact<{
+  input: UpdateDailyAttendanceDto;
+}>;
+
+
+export type UpdateDailyAttendanceMutation = { updateDailyAttendance: boolean };
+
+export type GetAttendanceRecordQueryVariables = Exact<{
+  rollNo: Scalars['Float']['input'];
+  subjectId: Scalars['String']['input'];
+}>;
+
+
+export type GetAttendanceRecordQuery = { getAttendanceRecord: { __typename: 'Attendance', id: string, semesterId: string, studentRollNo: number, subjectId: string, totalContactHours: number, attendedContactHours: number, attendancePercentage: number, attendanceRecords: Array<{ __typename: 'AttendanceRecord', date: Date, periods: Array<number>, monthNumber: number, isUpdated: boolean, attended: Array<boolean> }> } };
 
 export type ChangePasswordMutationVariables = Exact<{
   input: ChangePasswordInput;
