@@ -2,6 +2,27 @@ import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
 import NotificationContext from "./NotificationContext";
 
+//[ ] - add Prop type
+
+async function registerNotificationCategory() {
+  await Notifications.setNotificationCategoryAsync("attendance_actions", [
+    {
+      identifier: "YES",
+      buttonTitle: "Yes",
+      options: {
+        opensAppToForeground: false,
+      },
+    },
+    {
+      identifier: "NO",
+      buttonTitle: "No",
+      options: {
+        opensAppToForeground: true,
+      },
+    },
+  ]);
+}
+
 export const NotificationProvider = ({ children }) => {
   useEffect(() => {
     const notificationReceivedListener =
@@ -13,6 +34,8 @@ export const NotificationProvider = ({ children }) => {
       Notifications.addNotificationResponseReceivedListener((respone) => {
         console.log(respone);
       });
+
+    registerNotificationCategory();
 
     return () => {
       notificationReceivedListener.remove();
