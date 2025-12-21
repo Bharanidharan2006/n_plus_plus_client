@@ -41,7 +41,7 @@ export async function registerForPushNotificationsAsync() {
       console.log(pushTokenString);
       return pushTokenString;
     } catch (e: unknown) {
-      throw new Error(`${e}`);
+      throw new Error(`Error: ${e}`);
     }
   } else {
     throw new Error("Must use physical device for push notifications");
