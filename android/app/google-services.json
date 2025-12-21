@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "637322167828",
+    "project_id": "n-plus-plus",
+    "storage_bucket": "n-plus-plus.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:637322167828:android:e2e945aaaa0d1a450c8901",
+        "android_client_info": {
+          "package_name": "com.bharanidharankuppuchamy.nplusplusclient"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6lf24REMkVDo5_MRqUb35tgTk_zy6Qq0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

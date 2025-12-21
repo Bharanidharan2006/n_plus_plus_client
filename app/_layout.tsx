@@ -1,4 +1,5 @@
 import { useAuthStore } from "@/stores/auth.store";
+import { NotificationProvider } from "@/utils/NotificationProvider";
 import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
 import {
@@ -80,24 +81,30 @@ export default function RootLayout() {
 
   return (
     <>
-      <StatusBar backgroundColor="#1d1d1d" translucent={false} style="light" />
-      <Provider value={client}>
-        <ApolloProvider client={apolloClient}>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-            }}
-          >
-            <Stack.Protected guard={loggedIn}>
-              <Stack.Screen name="(tabs)" />
-            </Stack.Protected>
-            <Stack.Protected guard={!loggedIn}>
-              <Stack.Screen name="login" />
-              <Stack.Screen name="forgot_password" />
-            </Stack.Protected>
-          </Stack>
-        </ApolloProvider>
-      </Provider>
+      <NotificationProvider>
+        <StatusBar
+          backgroundColor="#1d1d1d"
+          translucent={false}
+          style="light"
+        />
+        <Provider value={client}>
+          <ApolloProvider client={apolloClient}>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+              }}
+            >
+              <Stack.Protected guard={loggedIn}>
+                <Stack.Screen name="(tabs)" />
+              </Stack.Protected>
+              <Stack.Protected guard={!loggedIn}>
+                <Stack.Screen name="login" />
+                <Stack.Screen name="forgot_password" />
+              </Stack.Protected>
+            </Stack>
+          </ApolloProvider>
+        </Provider>
+      </NotificationProvider>
     </>
   );
 }

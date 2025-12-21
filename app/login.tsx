@@ -2,6 +2,8 @@ import {
   LoginUserMutation,
   LoginUserMutationVariables,
 } from "@/graphql_interfaces/auth.interface";
+import { useNotificationStore } from "@/stores/notification.store";
+import { registerForPushNotificationsAsync } from "@/utils/registerForPushNotificationAsync";
 import { MaterialIcons } from "@expo/vector-icons";
 import { gql } from "@urql/core";
 import { Link, useRouter } from "expo-router";
@@ -41,6 +43,9 @@ export default function Login() {
     LoginUserMutationVariables
   >(LOGIN);
   const router = useRouter();
+  const { setExpoPushToken, setNotificationError } = useNotificationStore(
+    (state) => state
+  );
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
@@ -70,6 +75,11 @@ export default function Login() {
       await SecureStore.setItemAsync("accessToken", accessToken);
       await SecureStore.setItemAsync("refreshToken", refreshToken);
 
+      const token = await registerForPushNotificationsAsync();
+      if (token) {
+        setExpoPushToken(token);
+      }
+      console.log("hi");
       router.replace("/(tabs)/(home)");
       setErrorMessage("");
     } else if (response.error) {
