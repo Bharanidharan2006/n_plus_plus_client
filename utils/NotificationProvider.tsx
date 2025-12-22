@@ -5,7 +5,7 @@ import NotificationContext from "./NotificationContext";
 //[ ] - add Prop type
 
 async function registerNotificationCategory() {
-  await Notifications.setNotificationCategoryAsync("attendance_actions", [
+  await Notifications.setNotificationCategoryAsync("attendanceActions", [
     {
       identifier: "YES",
       buttonTitle: "Yes",

@@ -18,6 +18,7 @@ import { TypedDocumentNode, gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import * as Notifications from "expo-notifications";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
@@ -225,7 +226,9 @@ const Home = () => {
     }
   }, [error, weekError]);
 
-  // if (fetching) return null;
+  Notifications.getNotificationCategoriesAsync().then((d) => {
+    console.log(d);
+  }); // if (fetching) return null;
 
   return (
     <SafeAreaView style={[styles.container, { paddingBottom: tabBarHeight }]}>
