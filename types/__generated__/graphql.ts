@@ -66,6 +66,7 @@ export type Mutation = {
   registerUser: RegisterUserOutput;
   updateAttendance: Scalars['Boolean']['output'];
   updateDailyAttendance: Scalars['Boolean']['output'];
+  updatePushNotificationToken: Scalars['Boolean']['output'];
 };
 
 
@@ -119,8 +120,15 @@ export type MutationUpdateDailyAttendanceArgs = {
   input: UpdateDailyAttendanceDto;
 };
 
+
+export type MutationUpdatePushNotificationTokenArgs = {
+  notificationToken: Scalars['String']['input'];
+  rollNo: Scalars['Float']['input'];
+};
+
 export type Query = {
   __typename: 'Query';
+  SendMarkAttendanceNotification: Scalars['String']['output'];
   getAllWeeks: Array<Week>;
   getAttendancePercentage: Array<GetAttendancePercentageOutput>;
   getAttendanceRecord: Attendance;
@@ -183,8 +191,10 @@ export type User = {
   email: Scalars['String']['output'];
   id: Scalars['String']['output'];
   masterPassword: Scalars['String']['output'];
+  notificationToken: Scalars['String']['output'];
   password: Maybe<Scalars['String']['output']>;
   pendingDates: Array<Scalars['DateTime']['output']>;
+  phoneNo: Scalars['String']['output'];
   refreshTokenVersion: Scalars['Int']['output'];
   role: Scalars['String']['output'];
   rollNo: Scalars['Float']['output'];
@@ -225,6 +235,7 @@ export type EditWeekTimeTableDto = {
 export type RegisterUserInput = {
   currentSemester: Scalars['Float']['input'];
   email: Scalars['String']['input'];
+  phoneNo: Scalars['String']['input'];
   rollNo: Scalars['Float']['input'];
   userName: Scalars['String']['input'];
 };
@@ -235,7 +246,9 @@ export type RegisterUserOutput = {
   currentSemester: Scalars['Float']['output'];
   email: Scalars['String']['output'];
   id: Scalars['String']['output'];
+  notificationToken: Scalars['String']['output'];
   pendingDates: Array<Scalars['DateTime']['output']>;
+  phoneNo: Scalars['String']['output'];
   refreshTokenVersion: Scalars['Int']['output'];
   role: Scalars['String']['output'];
   rollNo: Scalars['Float']['output'];
@@ -259,7 +272,15 @@ export type GetUserQueryVariables = Exact<{
 }>;
 
 
-export type GetUserQuery = { getUser: { __typename: 'User', id: string, email: string, rollNo: number, userName: string, currentSemester: number, role: string, refreshTokenVersion: number, createdAt: Date | null, pendingDates: Array<Date> } };
+export type GetUserQuery = { getUser: { __typename: 'User', id: string, email: string, rollNo: number, userName: string, currentSemester: number, role: string, notificationToken: string, phoneNo: string, refreshTokenVersion: number, createdAt: Date | null, pendingDates: Array<Date> } };
+
+export type UpdatePushNotificationTokenMutationVariables = Exact<{
+  rollNo: Scalars['Float']['input'];
+  notificationToken: Scalars['String']['input'];
+}>;
+
+
+export type UpdatePushNotificationTokenMutation = { updatePushNotificationToken: boolean };
 
 export type RefreshTokenMutationVariables = Exact<{
   refreshToken: Scalars['String']['input'];

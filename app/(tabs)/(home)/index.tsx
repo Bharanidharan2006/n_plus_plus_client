@@ -11,6 +11,8 @@ import {
   GetUserQueryVariables,
   RefreshTokenMutation,
   RefreshTokenMutationVariables,
+  UpdatePushNotificationTokenMutation,
+  UpdatePushNotificationTokenMutationVariables,
   Week,
 } from "@/types/__generated__/graphql";
 import { subjectCodeMap } from "@/types/helpers";
@@ -43,10 +45,27 @@ export const GET_USER: TypedDocumentNode<
       userName
       currentSemester
       role
+      notificationToken
+      phoneNo
       refreshTokenVersion
       createdAt
       pendingDates
     }
+  }
+`;
+
+const UPDATE_PUSH_NOTIFICATION_TOKEN: TypedDocumentNode<
+  UpdatePushNotificationTokenMutation,
+  UpdatePushNotificationTokenMutationVariables
+> = gql`
+  mutation UpdatePushNotificationToken(
+    $rollNo: Float!
+    $notificationToken: String!
+  ) {
+    updatePushNotificationToken(
+      rollNo: $rollNo
+      notificationToken: $notificationToken
+    )
   }
 `;
 
@@ -104,6 +123,7 @@ const Home = () => {
   const refreshTokenStored = useAuthStore((state) => state.refreshToken);
   const setTokens = useAuthStore((state) => state.setTokens);
   const [week, setWeek] = useState<Week | null>(null);
+  const [notificationToken, setNotificationToken] = useState("");
   const setTimeTable = useTimeTableStore((state) => state.setTimeTable);
   const setSaturdayStatus = useTimeTableStore(
     (state) => state.setSaturdayStatus
@@ -148,6 +168,14 @@ const Home = () => {
     getNewAccessToken,
     { data: newRefreshToken, loading, error: refreshTokenError },
   ] = useMutation(REFRESH_TOKEN);
+  const [updatePushNotificationToken, { data: isTokenUpdated, _ }] =
+    useMutation(UPDATE_PUSH_NOTIFICATION_TOKEN, {
+      context: {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      },
+    });
   // const [{ data, error, fetching }, reexecuteQuery] = useQuery({
   //   query: GET_USER,
   //   variables: { token: accessToken },
@@ -173,11 +201,16 @@ const Home = () => {
   // Effect to handle token refresh if query fails
   //console.log(data);
 
+  const getExpoPushToken = async () => {
+    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    setNotificationToken(token);
+  };
+
   useEffect(() => {
     if (data) {
       setUser(data.getUser);
-      //console.log(data);
       attendancePercentageRefetch();
+      getExpoPushToken();
     }
     if (weekData) {
       setWeek(weekData.getLatestWeek);
@@ -196,6 +229,21 @@ const Home = () => {
       setAttendanceReport(modifiedAttendanceReport);
     }
   }, [data, weekData, attendancePercentageData]);
+
+  //When the user data has been fetched successfully, we will call the getExpoPushToken function so it will change the notificationToken state
+
+  useEffect(() => {
+    if (notificationToken && user) {
+      if (notificationToken !== user.notificationToken) {
+        updatePushNotificationToken({
+          variables: {
+            rollNo: user.rollNo,
+            notificationToken: notificationToken,
+          },
+        });
+      }
+    }
+  }, [notificationToken]);
 
   useEffect(() => {
     if (newRefreshToken) {
@@ -226,9 +274,7 @@ const Home = () => {
     }
   }, [error, weekError]);
 
-  Notifications.getNotificationCategoriesAsync().then((d) => {
-    console.log(d);
-  }); // if (fetching) return null;
+  // if (fetching) return null;
 
   return (
     <SafeAreaView style={[styles.container, { paddingBottom: tabBarHeight }]}>

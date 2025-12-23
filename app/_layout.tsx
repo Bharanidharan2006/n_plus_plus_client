@@ -54,7 +54,7 @@ const apolloClient = new ApolloClient({
 // Used to show notifications when the app is in foreground, the listeners are used when the app is in background.
 Notifications.setNotificationHandler({
   handleNotification: async (notification) => {
-    const categoryIdentifier = notification.request.content.categoryIdentifier;
+    const categoryIdentifier = notification.request.content.data?.categoryId;
     if (shouldBeHandledByBGTask(categoryIdentifier)) {
       return {
         shouldShowAlert: false,

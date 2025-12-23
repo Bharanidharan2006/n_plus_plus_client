@@ -8,6 +8,8 @@ type User = {
   userName: string;
   currentSemester: number;
   role: string;
+  notificationToken: string;
+  phoneNo: string;
   refreshTokenVersion: number;
   pendingDates: Date[];
 };

@@ -44,18 +44,12 @@ export const registerTask = () => {
             JSON.parse(taskPayload.data.dataString);
 
           if (shouldBeHandledByBGTask(categoryIdentifier)) {
+            console.log("hello");
+
             const id = await Notifications.scheduleNotificationAsync({
               content: {
                 title: expoData?.title ?? "unknown",
-                body: JSON.stringify(
-                  {
-                    time: new Date().toISOString(),
-                    appState: AppState.currentState,
-                    topLevelNumber,
-                  },
-                  null,
-                  2
-                ),
+                body: expoData?.body ?? "",
                 categoryIdentifier: categoryIdentifier,
                 data: {
                   hello: "there",
@@ -66,14 +60,14 @@ export const registerTask = () => {
             });
             console.log("Scheduled notification with id:", id);
           }
-
-          Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK).catch(
-            console.error
-          );
         }
       } catch (e) {
         console.log(`Err: ${e}`);
       }
     }
+  );
+
+  Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK).catch(
+    console.error
   );
 };
