@@ -1,0 +1,79 @@
+import * as Notifications from "expo-notifications";
+import { defineTask } from "expo-task-manager";
+import { AppState, Platform } from "react-native";
+import { addItemToStorage } from "./storage";
+
+const BACKGROUND_NOTIFICATION_TASK = "BACKGROUND_NOTIFICATION_TASK";
+
+export const shouldBeHandledByBGTask = (
+  categoryId: string | null | unknown
+): boolean => {
+  return categoryId === "attendance_actions";
+};
+
+let topLevelNumber = 0;
+export const registerTask = () => {
+  defineTask<Notifications.NotificationTaskPayload>(
+    BACKGROUND_NOTIFICATION_TASK,
+    async (params) => {
+      const taskPayload = params.data;
+      try {
+        console.log(
+          `${Platform.OS} ${BACKGROUND_NOTIFICATION_TASK}: App in ${
+            AppState.currentState
+          } state. data: ${JSON.stringify(taskPayload, null, 2)}`
+        );
+        ++topLevelNumber;
+
+        // Checking whether the task payload received is a notification or notification response
+
+        const isNotificationResponse = "actionIdentifier" in taskPayload;
+
+        if (isNotificationResponse) {
+          addItemToStorage({
+            source: "BACKGROUND_TASK_RESPONSE_RECEIVED",
+            data: taskPayload,
+          });
+        } else {
+          let categoryIdentifier = "attendance_actions"; // remove this
+          if (taskPayload.data.categoryId) {
+            categoryIdentifier = taskPayload.data.categoryId;
+          }
+          const expoData =
+            taskPayload.data.dataString &&
+            JSON.parse(taskPayload.data.dataString);
+
+          if (shouldBeHandledByBGTask(categoryIdentifier)) {
+            const id = await Notifications.scheduleNotificationAsync({
+              content: {
+                title: expoData?.title ?? "unknown",
+                body: JSON.stringify(
+                  {
+                    time: new Date().toISOString(),
+                    appState: AppState.currentState,
+                    topLevelNumber,
+                  },
+                  null,
+                  2
+                ),
+                categoryIdentifier: categoryIdentifier,
+                data: {
+                  hello: "there",
+                  presented: true,
+                },
+              },
+              trigger: null,
+            });
+            console.log("Scheduled notification with id:", id);
+          }
+
+          Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK).catch(
+            console.error
+          );
+        }
+      } catch (e) {
+        console.log(`Err: ${e}`);
+      }
+    }
+  );
+};

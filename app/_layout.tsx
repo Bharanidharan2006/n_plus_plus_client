@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/stores/auth.store";
 import { NotificationProvider } from "@/utils/NotificationProvider";
+import { shouldBeHandledByBGTask } from "@/utils/registerTask";
 import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
 import {
@@ -16,6 +17,7 @@ import {
   Poppins_800ExtraBold,
   useFonts as usePoppins,
 } from "@expo-google-fonts/poppins";
+import * as Notifications from "expo-notifications";
 import { Stack, useNavigation } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
@@ -49,7 +51,30 @@ const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-export default function RootLayout() {
+// Used to show notifications when the app is in foreground, the listeners are used when the app is in background.
+Notifications.setNotificationHandler({
+  handleNotification: async (notification) => {
+    const categoryIdentifier = notification.request.content.categoryIdentifier;
+    if (shouldBeHandledByBGTask(categoryIdentifier)) {
+      return {
+        shouldShowAlert: false,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+        shouldShowBanner: false,
+        shouldShowList: false,
+      };
+    }
+    return {
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: false,
+      shouldShowList: false,
+    };
+  },
+});
+
+function RootLayout() {
   const setTokens = useAuthStore((state) => state.setTokens);
   const navigator = useNavigation();
   const [loggedIn, setLoggedIn] = useState(false);
@@ -108,3 +133,5 @@ export default function RootLayout() {
     </>
   );
 }
+
+export default RootLayout;

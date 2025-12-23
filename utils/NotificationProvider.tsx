@@ -1,11 +1,12 @@
 import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
 import NotificationContext from "./NotificationContext";
+import { registerTask } from "./registerTask";
 
 //[ ] - add Prop type
 
 async function registerNotificationCategory() {
-  await Notifications.setNotificationCategoryAsync("attendanceActions", [
+  await Notifications.setNotificationCategoryAsync("attendance_actions", [
     {
       identifier: "YES",
       buttonTitle: "Yes",
@@ -36,6 +37,7 @@ export const NotificationProvider = ({ children }) => {
       });
 
     registerNotificationCategory();
+    registerTask();
 
     return () => {
       notificationReceivedListener.remove();

@@ -40,4 +40,4 @@ yarn-error.*
 app-example
 
 #firebase
-google-services.json
+#google-services.json
