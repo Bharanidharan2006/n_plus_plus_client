@@ -18,10 +18,10 @@ import {
   useFonts as usePoppins,
 } from "@expo-google-fonts/poppins";
 import * as Notifications from "expo-notifications";
-import { Stack, useNavigation } from "expo-router";
+import { Stack } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   cacheExchange,
   createClient,
@@ -75,9 +75,7 @@ Notifications.setNotificationHandler({
 });
 
 function RootLayout() {
-  const setTokens = useAuthStore((state) => state.setTokens);
-  const navigator = useNavigation();
-  const [loggedIn, setLoggedIn] = useState(false);
+  const { loggedIn, setTokens, setLoggedIn } = useAuthStore((state) => state);
   const [dmLoaded] = useDmSerif({
     "DMSerifDisplay-Regular": DMSerifDisplay_400Regular,
     // "DMSerifDisplay-Italic": DMSerifDisplay_400RegularItalic,

@@ -2,11 +2,12 @@ import {
   LoginUserMutation,
   LoginUserMutationVariables,
 } from "@/graphql_interfaces/auth.interface";
+import { useAuthStore } from "@/stores/auth.store";
 import { useNotificationStore } from "@/stores/notification.store";
 import { registerForPushNotificationsAsync } from "@/utils/registerForPushNotificationAsync";
 import { MaterialIcons } from "@expo/vector-icons";
 import { gql } from "@urql/core";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
 import {
@@ -34,6 +35,7 @@ const LOGIN = gql`
 `;
 
 export default function Login() {
+  const { setLoggedIn, setTokens } = useAuthStore((state) => state);
   const [rollNo, setRollNo] = useState("");
   const [password, setPassword] = useState("");
   const [secure, setSecure] = useState(true);
@@ -72,15 +74,21 @@ export default function Login() {
       const { accessToken, refreshToken } = response.data.loginUser;
 
       // Save tokens securely
-      await SecureStore.setItemAsync("accessToken", accessToken);
-      await SecureStore.setItemAsync("refreshToken", refreshToken);
+      SecureStore.setItemAsync("accessToken", accessToken);
+      SecureStore.setItemAsync("refreshToken", refreshToken);
 
+      // Also update the tokens in the global auth store
+      setTokens(accessToken, refreshToken);
+
+      //Update the global loggedIn status to ensure that you can navigate to protected routes.
+      setLoggedIn(true);
+
+      // Get the expo push token and set it to the global user store;
       const token = await registerForPushNotificationsAsync();
       if (token) {
         setExpoPushToken(token);
       }
-      console.log("hi");
-      router.replace("/(tabs)/(home)");
+
       setErrorMessage("");
     } else if (response.error) {
       console.error("Login failed", response.error);
@@ -160,8 +168,6 @@ export default function Login() {
               </TouchableOpacity>
             </View>
           </View>
-
-          <Link href={"/pd"}>Go to pending attendance</Link>
 
           {!keyboardVisible && (
             <View style={styles.iconWrapper}>
