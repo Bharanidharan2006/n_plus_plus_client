@@ -29,11 +29,16 @@ export const registerTask = () => {
 
         const isNotificationResponse = "actionIdentifier" in taskPayload;
 
+        console.log("boolean", isNotificationResponse);
+
         if (isNotificationResponse) {
           addItemToStorage({
-            source: "BACKGROUND_TASK_RESPONSE_RECEIVED",
+            source: "ATTENDANCE_ACTIONS_RESPONSE_RECEIVED",
             data: taskPayload,
           });
+          await Notifications.dismissNotificationAsync(
+            taskPayload.notification.request.identifier
+          );
         } else {
           let categoryIdentifier = "attendance_actions"; // remove this
           if (taskPayload.data.categoryId) {
@@ -44,15 +49,13 @@ export const registerTask = () => {
             JSON.parse(taskPayload.data.dataString);
 
           if (shouldBeHandledByBGTask(categoryIdentifier)) {
-            console.log("hello");
-
             const id = await Notifications.scheduleNotificationAsync({
               content: {
                 title: expoData?.title ?? "unknown",
                 body: expoData?.body ?? "",
                 categoryIdentifier: categoryIdentifier,
                 data: {
-                  hello: "there",
+                  actionId: expoData.actionId,
                   presented: true,
                 },
               },

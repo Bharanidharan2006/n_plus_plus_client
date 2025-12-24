@@ -103,7 +103,6 @@ const AttendanceRecord = () => {
           : 0
       );
     }
-    console.log(error);
   }, [data, error]);
 
   return (

@@ -62,6 +62,7 @@ export type Mutation = {
   editWeekTimeTable: Week;
   loginUser: LoginResponse;
   logout: Scalars['Boolean']['output'];
+  markAttendanceFromNotification: Scalars['Boolean']['output'];
   refreshToken: LoginResponse;
   registerUser: RegisterUserOutput;
   updateAttendance: Scalars['Boolean']['output'];
@@ -98,6 +99,11 @@ export type MutationLoginUserArgs = {
 
 export type MutationLogoutArgs = {
   rollno: Scalars['Float']['input'];
+};
+
+
+export type MutationMarkAttendanceFromNotificationArgs = {
+  actionId: Scalars['String']['input'];
 };
 
 
@@ -181,7 +187,7 @@ export type UpdateAttendanceDto = {
 export type UpdateDailyAttendanceDto = {
   attendanceData: Array<Scalars['Boolean']['input']>;
   date: Scalars['DateTime']['input'];
-  rollno: Scalars['Float']['input'];
+  rollNo: Scalars['Float']['input'];
 };
 
 export type User = {
@@ -322,6 +328,13 @@ export type GetAttendanceRecordQueryVariables = Exact<{
 
 
 export type GetAttendanceRecordQuery = { getAttendanceRecord: { __typename: 'Attendance', id: string, semesterId: string, studentRollNo: number, subjectId: string, totalContactHours: number, attendedContactHours: number, attendancePercentage: number, attendanceRecords: Array<{ __typename: 'AttendanceRecord', date: Date, periods: Array<number>, monthNumber: number, isUpdated: boolean, attended: Array<boolean> }> } };
+
+export type MarkAttendanceFromNotificationMutationVariables = Exact<{
+  actionId: Scalars['String']['input'];
+}>;
+
+
+export type MarkAttendanceFromNotificationMutation = { markAttendanceFromNotification: boolean };
 
 export type ChangePasswordMutationVariables = Exact<{
   input: ChangePasswordInput;

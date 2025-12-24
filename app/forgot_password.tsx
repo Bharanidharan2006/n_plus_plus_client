@@ -64,7 +64,7 @@ export default function ForgotPassword() {
     }
 
     if (response.data?.changePassword) {
-      router.replace("/(auth)/login");
+      router.replace("/login");
     }
   };
 

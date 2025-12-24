@@ -23,8 +23,21 @@ const PendingAttendanceSlot = ({ date }) => {
 };
 
 const PendingAttendanceIndex = () => {
-  const user = useUserStore((state) => state.user);
-  console.log(user?.pendingDates);
+  const { user, setUser } = useUserStore((state) => state);
+  // const { data, error, refetch } = useQuery(GET_USER, {
+  //   variables: { token: accessToken },
+  //   context: {
+  //     headers: {
+  //       authorization: `Bearer ${accessToken}`,
+  //     },
+  //   },
+  // });
+  // useEffect(() => {
+  //   if(!user){
+  //     const accessToken = SecureStore.getItem("accessToken");
+  //     const refreshToken = SecureStore.getItem("refreshToken");
+  //   }
+  // }, [])
 
   return (
     <SafeAreaView style={styles.container}>

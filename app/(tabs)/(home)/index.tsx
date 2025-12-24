@@ -9,6 +9,8 @@ import {
   GetLatestWeekQuery,
   GetUserQuery,
   GetUserQueryVariables,
+  MarkAttendanceFromNotificationMutation,
+  MarkAttendanceFromNotificationMutationVariables,
   RefreshTokenMutation,
   RefreshTokenMutationVariables,
   UpdatePushNotificationTokenMutation,
@@ -16,6 +18,7 @@ import {
   Week,
 } from "@/types/__generated__/graphql";
 import { subjectCodeMap } from "@/types/helpers";
+import { getStorageItemSync } from "@/utils/storage";
 import { TypedDocumentNode, gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -66,6 +69,15 @@ const UPDATE_PUSH_NOTIFICATION_TOKEN: TypedDocumentNode<
       rollNo: $rollNo
       notificationToken: $notificationToken
     )
+  }
+`;
+
+const MARK_ATTENDANCE_FROM_NOTIFICATION: TypedDocumentNode<
+  MarkAttendanceFromNotificationMutation,
+  MarkAttendanceFromNotificationMutationVariables
+> = gql`
+  mutation MarkAttendanceFromNotification($actionId: String!) {
+    markAttendanceFromNotification(actionId: $actionId)
   }
 `;
 
@@ -168,14 +180,20 @@ const Home = () => {
     getNewAccessToken,
     { data: newRefreshToken, loading, error: refreshTokenError },
   ] = useMutation(REFRESH_TOKEN);
-  const [updatePushNotificationToken, { data: isTokenUpdated, _ }] =
-    useMutation(UPDATE_PUSH_NOTIFICATION_TOKEN, {
+  const [updatePushNotificationToken, { data: isTokenUpdated }] = useMutation(
+    UPDATE_PUSH_NOTIFICATION_TOKEN,
+    {
       context: {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
       },
-    });
+    }
+  );
+
+  const [markAttendanceFromNotification] = useMutation(
+    MARK_ATTENDANCE_FROM_NOTIFICATION
+  );
   // const [{ data, error, fetching }, reexecuteQuery] = useQuery({
   //   query: GET_USER,
   //   variables: { token: accessToken },
@@ -274,6 +292,29 @@ const Home = () => {
     }
   }, [error, weekError]);
 
+  const sendPendingAttendances = async (notificationLogs: any) => {
+    for (const log of notificationLogs) {
+      if (log.source === "ATTENDANCE_ACTIONS_RESPONSE_RECEIVED") {
+        const actionId = JSON.parse(
+          log.data.notification.request.content.dataString
+        ).actionId;
+
+        await markAttendanceFromNotification({
+          variables: {
+            actionId: log.data.notification.request.content.data.actionId,
+          },
+        });
+      }
+    }
+  };
+
+  // useEffect that runs on component mount to send the pending notifications
+  // Todo: // make sure to catch the errors correctly
+  useEffect(() => {
+    const notificationLogs = JSON.parse(getStorageItemSync() ?? "[]");
+    sendPendingAttendances(notificationLogs);
+  }, []);
+
   // if (fetching) return null;
 
   return (
@@ -295,7 +336,7 @@ const Home = () => {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.push("/(app)/(shared)/attendance/")}
+          onPress={() => router.navigate("/(tabs)/attendance/record")}
         >
           <Text style={styles.buttonText}>View Attendance Record</Text>
         </TouchableOpacity>
@@ -316,7 +357,7 @@ const Home = () => {
               display: user && user.role === "Representative" ? "flex" : "none",
             }}
             onPress={() => {
-              router.push("/(app)/rep/timetable/edit_timetable");
+              router.push("/(tabs)/(home)/edit_timetable");
             }}
           >
             <MaterialIcons name="edit" size={24} color="white" />
