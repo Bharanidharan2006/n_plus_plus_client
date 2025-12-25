@@ -22,7 +22,6 @@ import { getStorageItemSync, removeItemSync } from "@/utils/storage";
 import { TypedDocumentNode, gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import * as Notifications from "expo-notifications";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -53,6 +52,8 @@ export const GET_USER: TypedDocumentNode<
       refreshTokenVersion
       createdAt
       pendingDates
+      gender
+      dob
     }
   }
 `;
@@ -127,7 +128,6 @@ export const GET_ATTENDANCE_PERCENTAGE: TypedDocumentNode<
 `;
 
 const Home = () => {
-  const tabBarHeight = useBottomTabBarHeight();
   const router = useRouter();
   const setUser = useUserStore((state) => state.setUser);
   const user = useUserStore((state) => state.user);
@@ -332,7 +332,7 @@ const Home = () => {
   // if (fetching) return null;
 
   return (
-    <SafeAreaView style={[styles.container, { paddingBottom: tabBarHeight }]}>
+    <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <Text style={{ ...styles.title, color: "#fff" }}>Hi,</Text>

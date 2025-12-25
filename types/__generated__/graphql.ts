@@ -134,7 +134,6 @@ export type MutationUpdatePushNotificationTokenArgs = {
 
 export type Query = {
   __typename: 'Query';
-  SendMarkAttendanceNotification: Scalars['String']['output'];
   getAllWeeks: Array<Week>;
   getAttendancePercentage: Array<GetAttendancePercentageOutput>;
   getAttendanceRecord: Attendance;
@@ -143,6 +142,8 @@ export type Query = {
   getSubjectDetails: Array<Subject>;
   getUser: User;
   methoddd: Scalars['Int']['output'];
+  sendMarkAttendanceNotification: Scalars['String']['output'];
+  updateAttendanceForAll: Scalars['String']['output'];
 };
 
 
@@ -194,7 +195,9 @@ export type User = {
   __typename: 'User';
   createdAt: Maybe<Scalars['DateTime']['output']>;
   currentSemester: Scalars['Int']['output'];
+  dob: Scalars['String']['output'];
   email: Scalars['String']['output'];
+  gender: Scalars['String']['output'];
   id: Scalars['String']['output'];
   masterPassword: Scalars['String']['output'];
   notificationToken: Scalars['String']['output'];
@@ -240,7 +243,9 @@ export type EditWeekTimeTableDto = {
 
 export type RegisterUserInput = {
   currentSemester: Scalars['Float']['input'];
+  dob: Scalars['String']['input'];
   email: Scalars['String']['input'];
+  gender: Scalars['String']['input'];
   phoneNo: Scalars['String']['input'];
   rollNo: Scalars['Float']['input'];
   userName: Scalars['String']['input'];
@@ -278,7 +283,7 @@ export type GetUserQueryVariables = Exact<{
 }>;
 
 
-export type GetUserQuery = { getUser: { __typename: 'User', id: string, email: string, rollNo: number, userName: string, currentSemester: number, role: string, notificationToken: string, phoneNo: string, refreshTokenVersion: number, createdAt: Date | null, pendingDates: Array<Date> } };
+export type GetUserQuery = { getUser: { __typename: 'User', id: string, email: string, rollNo: number, userName: string, currentSemester: number, role: string, notificationToken: string, phoneNo: string, refreshTokenVersion: number, createdAt: Date | null, pendingDates: Array<Date>, gender: string, dob: string } };
 
 export type UpdatePushNotificationTokenMutationVariables = Exact<{
   rollNo: Scalars['Float']['input'];
@@ -287,6 +292,13 @@ export type UpdatePushNotificationTokenMutationVariables = Exact<{
 
 
 export type UpdatePushNotificationTokenMutation = { updatePushNotificationToken: boolean };
+
+export type MarkAttendanceFromNotificationMutationVariables = Exact<{
+  actionId: Scalars['String']['input'];
+}>;
+
+
+export type MarkAttendanceFromNotificationMutation = { markAttendanceFromNotification: boolean };
 
 export type RefreshTokenMutationVariables = Exact<{
   refreshToken: Scalars['String']['input'];
@@ -328,13 +340,6 @@ export type GetAttendanceRecordQueryVariables = Exact<{
 
 
 export type GetAttendanceRecordQuery = { getAttendanceRecord: { __typename: 'Attendance', id: string, semesterId: string, studentRollNo: number, subjectId: string, totalContactHours: number, attendedContactHours: number, attendancePercentage: number, attendanceRecords: Array<{ __typename: 'AttendanceRecord', date: Date, periods: Array<number>, monthNumber: number, isUpdated: boolean, attended: Array<boolean> }> } };
-
-export type MarkAttendanceFromNotificationMutationVariables = Exact<{
-  actionId: Scalars['String']['input'];
-}>;
-
-
-export type MarkAttendanceFromNotificationMutation = { markAttendanceFromNotification: boolean };
 
 export type ChangePasswordMutationVariables = Exact<{
   input: ChangePasswordInput;

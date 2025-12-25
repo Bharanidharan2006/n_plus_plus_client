@@ -55,6 +55,15 @@ export default function TabLayout() {
           },
         }}
       />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ focused, color }) => (
+            <AntDesign name="profile" size={24} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

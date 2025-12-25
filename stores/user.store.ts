@@ -12,6 +12,8 @@ type User = {
   phoneNo: string;
   refreshTokenVersion: number;
   pendingDates: Date[];
+  dob: string;
+  gender: string;
 };
 
 type UserStore = {
