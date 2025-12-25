@@ -74,7 +74,10 @@ export default function ForgotPassword() {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        style={{ flex: 1, width: "100%" }}
+        style={[
+          { flex: 1, width: "100%" },
+          { paddingHorizontal: Platform.OS === "web" ? 30 : 0 },
+        ]}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView

@@ -73,14 +73,15 @@ export default function Login() {
     if (response.data) {
       const { accessToken, refreshToken } = response.data.loginUser;
 
-      // Save tokens securely
-      SecureStore.setItemAsync("accessToken", accessToken);
-      SecureStore.setItemAsync("refreshToken", refreshToken);
       if (Platform.OS === "web" && typeof localStorage !== "undefined") {
         try {
           localStorage.setItem("accessToken", accessToken);
           localStorage.setItem("refreshToken", refreshToken);
         } catch {}
+      } else {
+        // Save tokens securely
+        await SecureStore.setItemAsync("accessToken", accessToken);
+        await SecureStore.setItemAsync("refreshToken", refreshToken);
       }
 
       // Also update the tokens in the global auth store
@@ -90,9 +91,11 @@ export default function Login() {
       setLoggedIn(true);
 
       // Get the expo push token and set it to the global user store;
-      const token = await registerForPushNotificationsAsync();
-      if (token) {
-        setExpoPushToken(token);
+      if (Platform.OS !== "web") {
+        const token = await registerForPushNotificationsAsync();
+        if (token) {
+          setExpoPushToken(token);
+        }
       }
 
       setErrorMessage("");
@@ -111,7 +114,10 @@ export default function Login() {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={[
+          { flex: 1 },
+          { paddingHorizontal: Platform.OS === "web" ? 30 : 0 },
+        ]}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
@@ -172,7 +178,7 @@ export default function Login() {
               >
                 <Text style={styles.forgotText}>profile</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 onPress={handleLogin}
                 style={styles.loginButton}

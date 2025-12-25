@@ -27,13 +27,13 @@ import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
 import {
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export const GET_USER: TypedDocumentNode<
@@ -230,10 +230,12 @@ const Home = () => {
     if (data) {
       setUser(data.getUser);
       attendancePercentageRefetch();
-      getExpoPushToken();
-      const response = Notifications.getLastNotificationResponse();
-      if (response?.actionIdentifier === "NO") {
-        router.replace("/(tabs)/attendance/mark");
+      if (Platform.OS !== "web") {
+        getExpoPushToken();
+        const response = Notifications.getLastNotificationResponse();
+        if (response?.actionIdentifier === "NO") {
+          router.replace("/(tabs)/attendance/mark");
+        }
       }
     }
     if (weekData) {
@@ -272,14 +274,29 @@ const Home = () => {
   useEffect(() => {
     (async () => {
       if (newRefreshToken) {
-        await SecureStore.setItemAsync(
-          "refreshToken",
-          newRefreshToken.refreshToken.refreshToken
-        );
-        await SecureStore.setItemAsync(
-          "accessToken",
-          newRefreshToken.refreshToken.accessToken
-        );
+        Platform.OS === "web"
+          ? typeof localStorage !== "undefined"
+            ? localStorage.setItem(
+                "accessToken",
+                newRefreshToken.refreshToken.accessToken
+              )
+            : null
+          : await SecureStore.setItemAsync(
+              "accessToken",
+              newRefreshToken.refreshToken.accessToken
+            ); //
+
+        Platform.OS === "web"
+          ? typeof localStorage !== "undefined"
+            ? localStorage.setItem(
+                "refreshToken",
+                newRefreshToken.refreshToken.refreshToken
+              )
+            : null
+          : await SecureStore.setItemAsync(
+              "refreshToken",
+              newRefreshToken.refreshToken.refreshToken
+            );
         setTokens(
           newRefreshToken.refreshToken.accessToken,
           newRefreshToken.refreshToken.refreshToken
@@ -301,6 +318,7 @@ const Home = () => {
   }, [error, weekError]);
 
   const sendPendingAttendances = async (notificationLogs: any) => {
+    if (Platform.OS === "web") return;
     // [ ] - TODO
     //Currently catching errors and removing pending actions as a whole instead of sending request and removing one by one. Need to find a better way.
     try {
@@ -329,6 +347,7 @@ const Home = () => {
   // useEffect that runs on component mount to send the pending notifications
   // Todo: // make sure to catch the errors correctly
   useEffect(() => {
+    if (Platform.OS === "web") return;
     const notificationLogs = JSON.parse(getStorageItemSync() ?? "[]");
     sendPendingAttendances(notificationLogs);
   }, []);

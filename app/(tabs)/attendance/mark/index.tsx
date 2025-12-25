@@ -5,6 +5,7 @@ import { push } from "expo-router/build/global-state/routing";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect } from "react";
 import {
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -53,8 +54,16 @@ const PendingAttendanceIndex = () => {
   useEffect(() => {
     (async () => {
       try {
-        const accessTokenStored = await SecureStore.getItemAsync("accessToken");
-        const refreshTokenStored = await SecureStore.getItemAsync("refreshToken");
+        let refreshTokenStored;
+        let accessTokenStored;
+        if (Platform.OS === "web" && typeof localStorage !== "undefined") {
+          accessTokenStored = localStorage.getItem("accessToken");
+          refreshTokenStored = localStorage.getItem("refreshToken");
+        } else {
+          accessTokenStored = await SecureStore.getItemAsync("accessToken");
+          refreshTokenStored = await SecureStore.getItemAsync("refreshToken");
+        }
+
         setTokens(accessTokenStored ?? "", refreshTokenStored ?? "");
         refetch();
       } catch (e) {
@@ -78,14 +87,29 @@ const PendingAttendanceIndex = () => {
   useEffect(() => {
     (async () => {
       if (newRefreshToken) {
-        await SecureStore.setItemAsync(
-          "refreshToken",
-          newRefreshToken.refreshToken.refreshToken
-        );
-        await SecureStore.setItemAsync(
-          "accessToken",
-          newRefreshToken.refreshToken.accessToken
-        );
+        Platform.OS === "web"
+          ? typeof localStorage !== "undefined"
+            ? localStorage.setItem(
+                "accessToken",
+                newRefreshToken.refreshToken.accessToken
+              )
+            : null
+          : await SecureStore.setItemAsync(
+              "accessToken",
+              newRefreshToken.refreshToken.accessToken
+            ); //
+
+        Platform.OS === "web"
+          ? typeof localStorage !== "undefined"
+            ? localStorage.setItem(
+                "refreshToken",
+                newRefreshToken.refreshToken.refreshToken
+              )
+            : null
+          : await SecureStore.setItemAsync(
+              "refreshToken",
+              newRefreshToken.refreshToken.refreshToken
+            );
         setTokens(
           newRefreshToken.refreshToken.accessToken,
           newRefreshToken.refreshToken.refreshToken
