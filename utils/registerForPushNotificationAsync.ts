@@ -13,6 +13,10 @@ export async function registerForPushNotificationsAsync() {
     });
   }
 
+  if (Platform.OS === "web") {
+    return;
+  }
+
   if (Device.isDevice) {
     const { status: existingStatus } =
       await Notifications.getPermissionsAsync();

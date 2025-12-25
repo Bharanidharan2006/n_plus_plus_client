@@ -76,6 +76,12 @@ export default function Login() {
       // Save tokens securely
       SecureStore.setItemAsync("accessToken", accessToken);
       SecureStore.setItemAsync("refreshToken", refreshToken);
+      if (Platform.OS === "web" && typeof localStorage !== "undefined") {
+        try {
+          localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("refreshToken", refreshToken);
+        } catch {}
+      }
 
       // Also update the tokens in the global auth store
       setTokens(accessToken, refreshToken);
@@ -159,7 +165,14 @@ export default function Login() {
               >
                 <Text style={styles.forgotText}>Forgot Password?</Text>
               </TouchableOpacity>
-
+              <TouchableOpacity
+                touchSoundDisabled={false}
+                style={styles.forgotWrapper}
+                onPress={() => router.replace("/profile")}
+              >
+                <Text style={styles.forgotText}>profile</Text>
+              </TouchableOpacity>
+              
               <TouchableOpacity
                 onPress={handleLogin}
                 style={styles.loginButton}

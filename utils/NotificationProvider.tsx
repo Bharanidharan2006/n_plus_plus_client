@@ -5,7 +5,8 @@ import {
 import { gql, TypedDocumentNode } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import * as Notifications from "expo-notifications";
-import { useEffect } from "react";
+import { useEffect, ReactNode } from "react";
+import { Platform } from "react-native";
 import NotificationContext from "./NotificationContext";
 import { registerTask } from "./registerTask";
 import { addItemToStorage } from "./storage";
@@ -22,6 +23,7 @@ const MARK_ATTENDANCE_FROM_NOTIFICATION: TypedDocumentNode<
 `;
 
 async function registerNotificationCategory() {
+  if (Platform.OS === "web") return;
   await Notifications.setNotificationCategoryAsync("attendance_actions", [
     {
       identifier: "YES",
@@ -40,7 +42,7 @@ async function registerNotificationCategory() {
   ]);
 }
 
-export const NotificationProvider = ({ children }) => {
+export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [markAttendanceFromNotification] = useMutation(
     MARK_ATTENDANCE_FROM_NOTIFICATION
   );
@@ -71,13 +73,17 @@ export const NotificationProvider = ({ children }) => {
             data: response,
           });
         }
-        Notifications.dismissNotificationAsync(
-          response.notification.request.identifier
-        );
+        if (Platform.OS !== "web") {
+          Notifications.dismissNotificationAsync(
+            response.notification.request.identifier
+          );
+        }
       });
 
-    registerNotificationCategory();
-    registerTask();
+    if (Platform.OS !== "web") {
+      registerNotificationCategory();
+      registerTask();
+    }
 
     return () => {
       notificationReceivedListener.remove();

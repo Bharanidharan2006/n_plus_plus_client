@@ -14,7 +14,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GET_USER, REFRESH_TOKEN } from "../../(home)";
 
-const PendingAttendanceSlot = ({ date }) => {
+const PendingAttendanceSlot = ({ date }: { date: Date }) => {
   console.log(date);
 
   const dateInMMDDYYYY: string = date
@@ -51,18 +51,20 @@ const PendingAttendanceIndex = () => {
   ] = useMutation(REFRESH_TOKEN);
 
   useEffect(() => {
-    try {
-      const accessTokenStored = SecureStore.getItem("accessToken");
-      const refreshTokenStored = SecureStore.getItem("refreshToken");
-      setTokens(accessTokenStored ?? "", refreshTokenStored ?? "");
-      refetch();
-    } catch (e) {
-      if (error?.message.includes("Access token expired.")) {
-        getNewAccessToken({
-          variables: { refreshToken: refreshToken },
-        });
+    (async () => {
+      try {
+        const accessTokenStored = await SecureStore.getItemAsync("accessToken");
+        const refreshTokenStored = await SecureStore.getItemAsync("refreshToken");
+        setTokens(accessTokenStored ?? "", refreshTokenStored ?? "");
+        refetch();
+      } catch (e) {
+        if (error?.message.includes("Access token expired.")) {
+          getNewAccessToken({
+            variables: { refreshToken: refreshToken },
+          });
+        }
       }
-    }
+    })();
   }, []);
 
   // Code duplication - Separate the common functionality onto a single file.
@@ -74,21 +76,23 @@ const PendingAttendanceIndex = () => {
   }, [data]);
 
   useEffect(() => {
-    if (newRefreshToken) {
-      SecureStore.setItem(
-        "refreshToken",
-        newRefreshToken.refreshToken.refreshToken
-      );
-      SecureStore.setItem(
-        "accessToken",
-        newRefreshToken.refreshToken.accessToken
-      );
-      setTokens(
-        newRefreshToken.refreshToken.accessToken,
-        newRefreshToken.refreshToken.refreshToken
-      );
-      refetch();
-    }
+    (async () => {
+      if (newRefreshToken) {
+        await SecureStore.setItemAsync(
+          "refreshToken",
+          newRefreshToken.refreshToken.refreshToken
+        );
+        await SecureStore.setItemAsync(
+          "accessToken",
+          newRefreshToken.refreshToken.accessToken
+        );
+        setTokens(
+          newRefreshToken.refreshToken.accessToken,
+          newRefreshToken.refreshToken.refreshToken
+        );
+        refetch();
+      }
+    })();
   }, [newRefreshToken]);
 
   return (

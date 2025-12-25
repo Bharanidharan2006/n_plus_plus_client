@@ -34,6 +34,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export const GET_USER: TypedDocumentNode<
@@ -220,6 +221,7 @@ const Home = () => {
   //console.log(data);
 
   const getExpoPushToken = async () => {
+    if (Platform.OS === "web") return;
     const token = (await Notifications.getExpoPushTokenAsync()).data;
     setNotificationToken(token);
   };
@@ -268,21 +270,23 @@ const Home = () => {
   }, [notificationToken]);
 
   useEffect(() => {
-    if (newRefreshToken) {
-      SecureStore.setItem(
-        "refreshToken",
-        newRefreshToken.refreshToken.refreshToken
-      );
-      SecureStore.setItem(
-        "accessToken",
-        newRefreshToken.refreshToken.accessToken
-      );
-      setTokens(
-        newRefreshToken.refreshToken.accessToken,
-        newRefreshToken.refreshToken.refreshToken
-      );
-      refetch();
-    }
+    (async () => {
+      if (newRefreshToken) {
+        await SecureStore.setItemAsync(
+          "refreshToken",
+          newRefreshToken.refreshToken.refreshToken
+        );
+        await SecureStore.setItemAsync(
+          "accessToken",
+          newRefreshToken.refreshToken.accessToken
+        );
+        setTokens(
+          newRefreshToken.refreshToken.accessToken,
+          newRefreshToken.refreshToken.refreshToken
+        );
+        refetch();
+      }
+    })();
   }, [newRefreshToken]);
 
   useEffect(() => {

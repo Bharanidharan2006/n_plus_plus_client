@@ -22,6 +22,7 @@ import { SplashScreen, Stack, useRootNavigationState } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
+import { Platform } from "react-native";
 import {
   cacheExchange,
   createClient,
@@ -38,7 +39,7 @@ const client = createClient({
   url: API_LINK,
   exchanges: [debugExchange, cacheExchange, fetchExchange],
   fetchOptions: () => {
-    const token = SecureStore.getItem("accessToken");
+    const token = useAuthStore.getState().accessToken;
     return {
       headers: { authorization: token ? `Bearer ${token}` : "" },
     };
@@ -124,12 +125,26 @@ function RootLayout() {
   });
 
   useEffect(() => {
-    const accessToken = SecureStore.getItem("accessToken");
-    const refreshToken = SecureStore.getItem("refreshToken");
-    if (accessToken && refreshToken) {
-      setTokens(accessToken, refreshToken);
-      setLoggedIn(true);
-    }
+    (async () => {
+      try {
+        const accessToken =
+          Platform.OS === "web"
+            ? (typeof localStorage !== "undefined"
+                ? localStorage.getItem("accessToken")
+                : null)
+            : await SecureStore.getItemAsync("accessToken"); // 
+        const refreshToken =
+          Platform.OS === "web"
+            ? (typeof localStorage !== "undefined"
+                ? localStorage.getItem("refreshToken")
+                : null)
+            : await SecureStore.getItemAsync("refreshToken");
+        if (accessToken && refreshToken) {
+          setTokens(accessToken, refreshToken);
+          setLoggedIn(true);
+        }
+      } catch {}
+    })();
   }, []);
 
   if (!dmLoaded || !poppinsLoaded) return null;

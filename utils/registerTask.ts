@@ -13,6 +13,9 @@ export const shouldBeHandledByBGTask = (
 
 let topLevelNumber = 0;
 export const registerTask = () => {
+  if (Platform.OS === "web") {
+    return;
+  }
   defineTask<Notifications.NotificationTaskPayload>(
     BACKGROUND_NOTIFICATION_TASK,
     async (params) => {
@@ -39,13 +42,18 @@ export const registerTask = () => {
             taskPayload.notification.request.identifier
           );
         } else {
-          let categoryIdentifier = "attendance_actions"; // remove this
-          if (taskPayload.data.categoryId) {
-            categoryIdentifier = taskPayload.data.categoryId;
+          let categoryIdentifier: string = "attendance_actions";
+          const maybeCategoryId = (taskPayload as any)?.data?.categoryId;
+          if (typeof maybeCategoryId === "string") {
+            categoryIdentifier = maybeCategoryId;
           }
-          const expoData =
-            taskPayload.data.dataString &&
-            JSON.parse(taskPayload.data.dataString);
+          let expoData: any = {};
+          try {
+            const raw = (taskPayload as any)?.data?.dataString;
+            if (typeof raw === "string" && raw.length > 0) {
+              expoData = JSON.parse(raw);
+            }
+          } catch {}
 
           if (shouldBeHandledByBGTask(categoryIdentifier)) {
             const id = await Notifications.scheduleNotificationAsync({

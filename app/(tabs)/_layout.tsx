@@ -43,7 +43,7 @@ export default function TabLayout() {
           title: "Attendance",
           popToTopOnBlur: true,
           tabBarIcon: ({ focused, color }) => (
-            <AntDesign name="carry-out" size={24} color={color} />
+            <AntDesign name="carryout" size={24} color={color} />
           ),
         }}
         listeners={{
