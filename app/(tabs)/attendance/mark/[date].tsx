@@ -69,7 +69,7 @@ const UpdatePendingAttendance = () => {
       input: {
         date: dateObj,
         attendanceData: attendance,
-        rollno: user ? user.rollNo : 0,
+        rollNo: user ? user.rollNo : 0,
       },
     },
   });

@@ -1,9 +1,25 @@
+import {
+  MarkAttendanceFromNotificationMutation,
+  MarkAttendanceFromNotificationMutationVariables,
+} from "@/types/__generated__/graphql";
+import { gql, TypedDocumentNode } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
 import NotificationContext from "./NotificationContext";
 import { registerTask } from "./registerTask";
+import { addItemToStorage } from "./storage.native";
 
 //[ ] - add Prop type
+
+const MARK_ATTENDANCE_FROM_NOTIFICATION: TypedDocumentNode<
+  MarkAttendanceFromNotificationMutation,
+  MarkAttendanceFromNotificationMutationVariables
+> = gql`
+  mutation MarkAttendanceFromNotification($actionId: String!) {
+    markAttendanceFromNotification(actionId: $actionId)
+  }
+`;
 
 async function registerNotificationCategory() {
   await Notifications.setNotificationCategoryAsync("attendance_actions", [
@@ -25,6 +41,16 @@ async function registerNotificationCategory() {
 }
 
 export const NotificationProvider = ({ children }) => {
+  const [markAttendanceFromNotification] = useMutation(
+    MARK_ATTENDANCE_FROM_NOTIFICATION
+  );
+  const sendMarkAttendanceFromNotification = async (actionId: any) => {
+    await markAttendanceFromNotification({
+      variables: {
+        actionId: actionId,
+      },
+    });
+  };
   useEffect(() => {
     const notificationReceivedListener =
       Notifications.addNotificationReceivedListener((notification) => {
@@ -32,8 +58,22 @@ export const NotificationProvider = ({ children }) => {
       });
 
     const notificationResponseReceivedListener =
-      Notifications.addNotificationResponseReceivedListener((respone) => {
-        console.log(respone);
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        try {
+          if (response.actionIdentifier === "YES") {
+            sendMarkAttendanceFromNotification(
+              response.notification.request.content.data.actionId
+            );
+          }
+        } catch (error) {
+          addItemToStorage({
+            source: "ATTENDANCE_ACTIONS_RESPONSE_RECEIVED",
+            data: response,
+          });
+        }
+        Notifications.dismissNotificationAsync(
+          response.notification.request.identifier
+        );
       });
 
     registerNotificationCategory();

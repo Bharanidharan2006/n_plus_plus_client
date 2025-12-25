@@ -18,7 +18,7 @@ import {
   Week,
 } from "@/types/__generated__/graphql";
 import { subjectCodeMap } from "@/types/helpers";
-import { getStorageItemSync } from "@/utils/storage";
+import { getStorageItemSync, removeItemSync } from "@/utils/storage.native";
 import { TypedDocumentNode, gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -81,7 +81,7 @@ const MARK_ATTENDANCE_FROM_NOTIFICATION: TypedDocumentNode<
   }
 `;
 
-const REFRESH_TOKEN: TypedDocumentNode<
+export const REFRESH_TOKEN: TypedDocumentNode<
   RefreshTokenMutation,
   RefreshTokenMutationVariables
 > = gql`
@@ -229,6 +229,10 @@ const Home = () => {
       setUser(data.getUser);
       attendancePercentageRefetch();
       getExpoPushToken();
+      const response = Notifications.getLastNotificationResponse();
+      if (response?.actionIdentifier === "NO") {
+        router.replace("/(tabs)/attendance/mark");
+      }
     }
     if (weekData) {
       setWeek(weekData.getLatestWeek);
@@ -293,19 +297,29 @@ const Home = () => {
   }, [error, weekError]);
 
   const sendPendingAttendances = async (notificationLogs: any) => {
-    for (const log of notificationLogs) {
-      if (log.source === "ATTENDANCE_ACTIONS_RESPONSE_RECEIVED") {
-        const actionId = JSON.parse(
-          log.data.notification.request.content.dataString
-        ).actionId;
+    // [ ] - TODO
+    //Currently catching errors and removing pending actions as a whole instead of sending request and removing one by one. Need to find a better way.
+    try {
+      for (const log of notificationLogs) {
+        if (log.source === "ATTENDANCE_ACTIONS_RESPONSE_RECEIVED") {
+          const actionId = JSON.parse(
+            log.data.notification.request.content.dataString
+          ).actionId;
 
-        await markAttendanceFromNotification({
-          variables: {
-            actionId: log.data.notification.request.content.data.actionId,
-          },
-        });
+          console.log(actionId);
+
+          await markAttendanceFromNotification({
+            variables: {
+              actionId: actionId,
+            },
+          });
+        }
       }
+    } catch (error) {
+      console.log(error);
+      return;
     }
+    removeItemSync();
   };
 
   // useEffect that runs on component mount to send the pending notifications

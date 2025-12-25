@@ -1,7 +1,7 @@
 import * as Notifications from "expo-notifications";
 import { defineTask } from "expo-task-manager";
 import { AppState, Platform } from "react-native";
-import { addItemToStorage } from "./storage";
+import { addItemToStorage } from "./storage.native";
 
 const BACKGROUND_NOTIFICATION_TASK = "BACKGROUND_NOTIFICATION_TASK";
 
@@ -29,9 +29,8 @@ export const registerTask = () => {
 
         const isNotificationResponse = "actionIdentifier" in taskPayload;
 
-        console.log("boolean", isNotificationResponse);
-
         if (isNotificationResponse) {
+          if (taskPayload.actionIdentifier === "NO") return;
           addItemToStorage({
             source: "ATTENDANCE_ACTIONS_RESPONSE_RECEIVED",
             data: taskPayload,

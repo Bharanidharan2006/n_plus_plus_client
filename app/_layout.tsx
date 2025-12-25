@@ -18,10 +18,10 @@ import {
   useFonts as usePoppins,
 } from "@expo-google-fonts/poppins";
 import * as Notifications from "expo-notifications";
-import { Stack } from "expo-router";
+import { SplashScreen, Stack, useRootNavigationState } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   cacheExchange,
   createClient,
@@ -74,8 +74,40 @@ Notifications.setNotificationHandler({
   },
 });
 
+SplashScreen.preventAutoHideAsync();
+
 function RootLayout() {
   const { loggedIn, setTokens, setLoggedIn } = useAuthStore((state) => state);
+  const navReady = useRootNavigationState();
+  const [apolloReady, setApolloReady] = useState(false);
+  const [targetRoute, setTargetRoute] = useState<string | null>(null);
+  const [appReady, setAppReady] = useState(false);
+
+  // useEffect(() => {
+  //   if (apolloClient) {
+  //     setApolloReady(true);
+  //     console.log("apolloReady");
+  //   }
+  // }, [apolloClient]);
+
+  // useEffect(() => {
+  //   if (!!navReady?.key || !apolloReady) return;
+
+  //   SplashScreen.hideAsync();
+  //   setAppReady(true);
+  //   console.log("appReady");
+  //   // This error is ok since I always know that either targetRoute has null or a valid route.
+  //   if (targetRoute) {
+  //     router.replace(targetRoute);
+  //   }
+  // }, [navReady, apolloReady, targetRoute]);
+
+  // useEffect(() => {
+  //   if (navReady && apolloReady) {
+  //     setAppReady(true);
+  //   }
+  // }, [navReady, apolloReady]);
+
   const [dmLoaded] = useDmSerif({
     "DMSerifDisplay-Regular": DMSerifDisplay_400Regular,
     // "DMSerifDisplay-Italic": DMSerifDisplay_400RegularItalic,
@@ -100,18 +132,14 @@ function RootLayout() {
     }
   }, []);
 
-  if (!dmLoaded && !poppinsLoaded) return null;
+  if (!dmLoaded || !poppinsLoaded) return null;
 
   return (
     <>
-      <NotificationProvider>
-        <StatusBar
-          backgroundColor="#1d1d1d"
-          translucent={false}
-          style="light"
-        />
-        <Provider value={client}>
-          <ApolloProvider client={apolloClient}>
+      <StatusBar backgroundColor="#1d1d1d" translucent={false} style="light" />
+      <Provider value={client}>
+        <ApolloProvider client={apolloClient}>
+          <NotificationProvider>
             <Stack
               screenOptions={{
                 headerShown: false,
@@ -125,9 +153,9 @@ function RootLayout() {
                 <Stack.Screen name="forgot_password" />
               </Stack.Protected>
             </Stack>
-          </ApolloProvider>
-        </Provider>
-      </NotificationProvider>
+          </NotificationProvider>
+        </ApolloProvider>
+      </Provider>
     </>
   );
 }

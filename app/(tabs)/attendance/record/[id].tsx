@@ -71,7 +71,7 @@ const AttendanceRecord = () => {
   useEffect(() => {
     const attendanceRecord = new Map();
     if (data?.getAttendanceRecord?.attendanceRecords) {
-      data?.getAttendanceRecord.attendanceRecords.forEach((record) => {
+      data?.getAttendanceRecord?.attendanceRecords.forEach((record) => {
         if (
           !attendanceRecord.has(record?.monthNumber ? record.monthNumber : -1)
         ) {
@@ -190,22 +190,24 @@ const AttendanceRecord = () => {
         </View>
 
         {attendanceRecordStatus &&
-          [...attendanceRecordMap.entries()].map(([monthNumber, records]) => (
-            <React.Fragment key={monthNumber}>
-              <Text style={styles.historyMonth}>
-                {monthMap[Number(monthNumber)]}
-              </Text>
-              {records.map((record, i) => (
-                <AttendanceEntry
-                  key={`${record.date}-${i}`}
-                  date={record.date}
-                  periods={record.periods}
-                  attended={record.attended}
-                  isUpdated={record.isUpdated}
-                />
-              ))}
-            </React.Fragment>
-          ))}
+          [...attendanceRecordMap.entries()]
+            .reverse()
+            .map(([monthNumber, records]) => (
+              <React.Fragment key={monthNumber}>
+                <Text style={styles.historyMonth}>
+                  {monthMap[Number(monthNumber)]}
+                </Text>
+                {records.map((record, i) => (
+                  <AttendanceEntry
+                    key={`${record.date}-${i}`}
+                    date={record.date}
+                    periods={record.periods}
+                    attended={record.attended}
+                    isUpdated={record.isUpdated}
+                  />
+                ))}
+              </React.Fragment>
+            ))}
       </ScrollView>
     </SafeAreaView>
   );
