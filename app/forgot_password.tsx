@@ -2,9 +2,11 @@ import {
   ChangePasswordMutation,
   ChangePasswordMutationVariables,
 } from "@/graphql_interfaces/auth.interface";
+import { gql, TypedDocumentNode } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -17,9 +19,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { gql, useMutation } from "urql";
 
-const FORGOT_PASSWORD = gql`
+const FORGOT_PASSWORD: TypedDocumentNode<
+  ChangePasswordMutation,
+  ChangePasswordMutationVariables
+> = gql`
   mutation ChangePassword($input: changePasswordInput!) {
     changePassword(input: $input)
   }
@@ -32,13 +36,19 @@ export default function ForgotPassword() {
   const [passwordError, setPasswordError] = useState("");
   const [masterPasswordError, setMasterPasswordError] = useState("");
   const [generalError, setGeneralError] = useState(""); // <-- new state
-  const [result, changePassword] = useMutation<
-    ChangePasswordMutation,
-    ChangePasswordMutationVariables
-  >(FORGOT_PASSWORD);
+  const [changePassword, { data, error }] = useMutation(FORGOT_PASSWORD);
   const [secure, setSecure] = useState(true);
   const [rollNo, setRollNo] = useState("");
   const router = useRouter();
+
+  useEffect(() => {
+    if (data && data?.changePassword) {
+      router.replace("/login");
+    }
+    if (error) {
+      console.log(error);
+    }
+  }, [data, error]);
 
   const handleSubmission = async () => {
     setGeneralError(""); // reset before new request
@@ -48,24 +58,17 @@ export default function ForgotPassword() {
       return;
     }
 
-    const variables = {
-      input: {
-        masterPassword,
-        password: confirmPassword,
-        rollno: parseFloat(rollNo),
+    console.log(masterPassword, password, parseFloat(rollNo));
+
+    await changePassword({
+      variables: {
+        input: {
+          masterPassword,
+          password: confirmPassword,
+          rollno: parseFloat(rollNo),
+        },
       },
-    };
-
-    const response = await changePassword(variables);
-
-    if (response.error || response.data?.changePassword === false) {
-      setGeneralError("Invalid credentials");
-      return;
-    }
-
-    if (response.data?.changePassword) {
-      router.replace("/login");
-    }
+    });
   };
 
   return (
