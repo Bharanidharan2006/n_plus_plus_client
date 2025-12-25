@@ -8,7 +8,7 @@ import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
 import NotificationContext from "./NotificationContext";
 import { registerTask } from "./registerTask";
-import { addItemToStorage } from "./storage.native";
+import { addItemToStorage } from "./storage";
 
 //[ ] - add Prop type
 

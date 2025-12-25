@@ -1,7 +1,7 @@
 import * as Notifications from "expo-notifications";
 import { defineTask } from "expo-task-manager";
 import { AppState, Platform } from "react-native";
-import { addItemToStorage } from "./storage.native";
+import { addItemToStorage } from "./storage";
 
 const BACKGROUND_NOTIFICATION_TASK = "BACKGROUND_NOTIFICATION_TASK";
 

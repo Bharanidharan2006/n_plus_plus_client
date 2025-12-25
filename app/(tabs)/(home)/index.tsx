@@ -18,7 +18,7 @@ import {
   Week,
 } from "@/types/__generated__/graphql";
 import { subjectCodeMap } from "@/types/helpers";
-import { getStorageItemSync, removeItemSync } from "@/utils/storage.native";
+import { getStorageItemSync, removeItemSync } from "@/utils/storage";
 import { TypedDocumentNode, gql } from "@apollo/client";
 import { useMutation, useQuery } from "@apollo/client/react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
