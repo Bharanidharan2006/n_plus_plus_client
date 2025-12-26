@@ -12,7 +12,7 @@ export default function Profile() {
   const user = useUserStore((state) => state.user);
   const setLoggedIn = useAuthStore((state) => state.setLoggedIn);
   const getAvatar = (seed: string) =>
-    `https://api.dicebear.com/7.x/avataaars/png?seed=${encodeURIComponent(
+    `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(
       seed
     )}`;
   const handleLogout = () => {
@@ -31,8 +31,7 @@ export default function Profile() {
             <View style={styles.profileCardTextContainer}>
               <View style={{ display: "flex" }}>
                 <Text style={styles.profileCardText}>
-                  {(user && user.userName) ||
-                    "USERNAME USERNAME USERNAME USERNAME USERNAME"}
+                  {(user && user.userName) || "USERNAME"}
                 </Text>
               </View>
 

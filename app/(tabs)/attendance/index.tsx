@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const Action = ({ actionName, href }) => {
   return (
-    <View style={styles.action}>
+    <TouchableOpacity style={styles.action} onPress={() => push(`${href}`)}>
       <Text style={styles.actionText}>{actionName}</Text>
       <TouchableOpacity
         style={styles.actionNextBtn}
@@ -14,7 +14,7 @@ const Action = ({ actionName, href }) => {
       >
         <MaterialIcons name="navigate-next" size={30} color="white" />
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 };
 

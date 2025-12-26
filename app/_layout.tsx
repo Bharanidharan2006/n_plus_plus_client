@@ -18,10 +18,10 @@ import {
   useFonts as usePoppins,
 } from "@expo-google-fonts/poppins";
 import * as Notifications from "expo-notifications";
-import { SplashScreen, Stack, useRootNavigationState } from "expo-router";
+import { Stack, useRootNavigationState } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import {
   cacheExchange,
@@ -74,8 +74,6 @@ Notifications.setNotificationHandler({
     };
   },
 });
-
-SplashScreen.preventAutoHideAsync();
 
 function RootLayout() {
   const { loggedIn, setTokens, setLoggedIn } = useAuthStore((state) => state);

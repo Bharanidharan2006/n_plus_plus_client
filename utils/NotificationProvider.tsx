@@ -5,8 +5,9 @@ import {
 import { gql, TypedDocumentNode } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import * as Notifications from "expo-notifications";
-import { useEffect, ReactNode } from "react";
-import { Platform } from "react-native";
+import { router } from "expo-router";
+import { ReactNode, useEffect } from "react";
+import { AppState, Platform } from "react-native";
 import NotificationContext from "./NotificationContext";
 import { registerTask } from "./registerTask";
 import { addItemToStorage } from "./storage";
@@ -66,6 +67,11 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
             sendMarkAttendanceFromNotification(
               response.notification.request.content.data.actionId
             );
+          } else if (
+            response.actionIdentifier === "NO" &&
+            AppState.currentState === "active"
+          ) {
+            router.navigate("/(tabs)/attendance/mark");
           }
         } catch (error) {
           addItemToStorage({

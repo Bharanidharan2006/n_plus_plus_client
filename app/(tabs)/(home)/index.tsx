@@ -1,6 +1,7 @@
 import BarChart from "@/components/BarChart";
 import TimeTable from "@/components/TimeTable";
 import { useAuthStore } from "@/stores/auth.store";
+import { useLoadingStore } from "@/stores/loading.store";
 import { useTimeTableStore } from "@/stores/timeTable.store";
 import { useUserStore } from "@/stores/user.store";
 import {
@@ -129,6 +130,11 @@ export const GET_ATTENDANCE_PERCENTAGE: TypedDocumentNode<
 `;
 
 const Home = () => {
+  const setLoading = useLoadingStore((state) => state.setLoading);
+
+  //Setting the loading state
+  setLoading(true);
+
   const router = useRouter();
   const setUser = useUserStore((state) => state.setUser);
   const user = useUserStore((state) => state.user);
@@ -142,6 +148,7 @@ const Home = () => {
     (state) => state.setSaturdayStatus
   );
   const setId = useTimeTableStore((state) => state.setId);
+
   const [attendanceReport, setAttendanceReport] = useState<
     {
       attendancePercentage: number;
@@ -230,6 +237,7 @@ const Home = () => {
     if (data) {
       setUser(data.getUser);
       attendancePercentageRefetch();
+      setLoading(false);
       if (Platform.OS !== "web") {
         getExpoPushToken();
         const response = Notifications.getLastNotificationResponse();

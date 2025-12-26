@@ -106,6 +106,8 @@ const EditTimeTable = () => {
     if (newTTData) {
       setTimeTable(newTTData.editWeekTimeTable.timeTable);
       setSaturdayStatus(newTTData.editWeekTimeTable.saturdayStatus);
+      // Add a success message
+      router.back();
       return;
     }
 
