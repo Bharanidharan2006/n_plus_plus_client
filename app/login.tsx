@@ -1,6 +1,6 @@
 import {
-  LoginUserMutation,
-  LoginUserMutationVariables,
+    LoginUserMutation,
+    LoginUserMutationVariables,
 } from "@/graphql_interfaces/auth.interface";
 import { useAuthStore } from "@/stores/auth.store";
 import { useNotificationStore } from "@/stores/notification.store";
@@ -11,17 +11,17 @@ import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
 import {
-  Image,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Image,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { useMutation } from "urql";
 
@@ -73,13 +73,15 @@ export default function Login() {
     if (response.data) {
       const { accessToken, refreshToken } = response.data.loginUser;
 
-      if (Platform.OS === "web" && typeof localStorage !== "undefined") {
+if (Platform.OS === "web" && typeof localStorage !== "undefined") {
+      if (Platform.OS === "web") {
         try {
-          localStorage.setItem("accessToken", accessToken);
-          localStorage.setItem("refreshToken", refreshToken);
+          if (typeof localStorage !== "undefined") {
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
+          }
         } catch {}
       } else {
-        // Save tokens securely
         await SecureStore.setItemAsync("accessToken", accessToken);
         await SecureStore.setItemAsync("refreshToken", refreshToken);
       }
@@ -305,4 +307,4 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Regular",
     textAlign: "center",
   },
-});
+})};

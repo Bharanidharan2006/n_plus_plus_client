@@ -1,251 +1,146 @@
-import React from "react";
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView, StyleSheet } from "react-native";
 
+import React, { Component } from 'react'
+import { Text, View, Image } from 'react-native'
 import { useUserStore } from "@/stores/user.store";
-import { Ionicons } from "@expo/vector-icons";
+import { useAuthStore } from "@/stores/auth.store";
 import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+
+
 export default function Profile() {
-  const user = useUserStore((state) => state.user);
-  const getAvatar = (seed: string) =>
-    `https://api.dicebear.com/7.x/notionists/png?seed=${encodeURIComponent(
-      seed
-    )}`;
-  const avatar = getAvatar(user?.userName ? user.userName : "defaultPerson"); // change with name
+  const user = useUserStore((state) => state.user)
+  const setLoggedIn = useAuthStore(state => state.setLoggedIn);
+  const getAvatar = (seed: string) => `https://api.dicebear.com/7.x/avataaars/png?seed=${encodeURIComponent(seed)}`
+  const handleLogout = () => {
+    setLoggedIn(false);
+    router.navigate("/login")
+  }
+  const avatar = getAvatar(user?.userName ? user.userName : "defaultPerson") // change with name
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={[styles.scrollContainer]}>
-        <View style={{ width: "100%" }}>
-          <View
-            style={{
-              width: "100%",
-              padding: 10,
-              backgroundColor: "#111111ff",
-              borderRadius: 15,
-            }}
-          >
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "flex-end",
-              }}
-            >
-              <View style={{ paddingHorizontal: 10 }}>
-                <Image
-                  style={{
-                    borderColor: "#19aa59",
-                    width: 100,
-                    height: 100,
-                    backgroundColor: "",
-                    borderRadius: 50,
-                    borderWidth: 2,
-                  }}
-                  source={{ uri: avatar }}
-                />
-              </View>
-              <View
-                style={{
-                  paddingLeft: 30,
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                <Text
-                  style={[
-                    {
-                      fontFamily: "DMSerifDisplay-Regular",
-                      fontSize: 22,
-                      color: "#19aa59",
-                    },
-                  ]}
-                >
-                  {user?.userName}{" "}
-                  {
-                    //change with name
-                  }
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: "Poppins-Regular",
-                    fontSize: 16,
-                    paddingVertical: 10,
-                    color: "#fff",
-                  }}
-                >
-                  {user?.rollNo}{" "}
-                  {
-                    //change with roll
-                  }
-                </Text>
-              </View>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View>
+          <View style={styles.profileCard}>
+            <View style={{ paddingHorizontal: 10 }}>
+              <Image style={styles.avatarImage} source={{ uri: avatar }} />
             </View>
-          </View>
-        </View>
-        <View
-          style={{
-            marginTop: 20,
-            width: "100%",
-            backgroundColor: "#111111ff",
-            borderRadius: 10,
-          }}
-        >
-          <View style={{ paddingLeft: 20, paddingTop: 20 }}>
-            <Text
-              style={{
-                fontFamily: "DMSerifDisplay-Regular",
-                color: "#19aa59",
-                fontSize: 26,
-              }}
-            >
-              Personal Info
-            </Text>
-          </View>
-          <View
-            style={{
-              padding: 10,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <View
-              style={{
-                marginVertical: 5,
-                display: "flex",
-                width: "100%",
-                flexDirection: "row",
-                paddingVertical: 5,
-                alignItems: "center",
-              }}
-            >
-              <View style={{ justifyContent: "flex-start", paddingLeft: 15 }}>
-                <Ionicons
-                  name="mail-outline"
-                  size={24}
-                  style={{ color: "white" }}
-                />
+            <View style={styles.profileCardTextContainer}>
+              <View style={{ display: "flex" }}>
+                <Text style={styles.profileCardText}>
+                  {(user && user.userName) || "USERNAME USERNAME USERNAME USERNAME USERNAME"}
+
+                </Text>
               </View>
-              <View style={{ paddingLeft: 15 }}>
-                {/* <Text style={{color:"#9CA3AF" , fontFamily:"Poppins-Light"}}>
+
+              <View>
+                <Text style={styles.subtitleProfile}>
+                  2024103040
+                </Text>
+              </View>
+
+            </View>
+
+          </View>
+
+
+          <View style={styles.detailsCard}>
+            <View style={{ paddingLeft: 20, paddingTop: 20 }}>
+              <Text style={styles.profileInfo}>
+                Personal Info
+              </Text>
+            </View>
+            <View style={{ padding: 10, display: "flex", flex: 1 }}>
+              <View style={styles.detailView}>
+
+                <View style={styles.detailsIcon}>
+                  <Ionicons name='mail-outline' size={24} style={{ color: "white" }} />
+                </View>
+                <View style={{ paddingLeft: 15 }}>
+                  {/* <Text style={{color:"#9CA3AF" , fontFamily:"Poppins-Light"}}>
                                     Mail
                                 </Text> */}
-                <Text
-                  style={{
-                    fontFamily: "Poppins-Regular",
-                    fontSize: 18,
-                    color: "#fff",
-                  }}
-                >
-                  {user?.email}
-                </Text>
+                  <Text style={styles.detailText}>
+                    {user ? user.email : "mkiwemdimuksith@gmail.com"}
+                  </Text>
+                </View>
               </View>
-            </View>
 
-            <View
-              style={{
-                marginVertical: 6,
-                display: "flex",
-                width: "100%",
-                flexDirection: "row",
-                paddingVertical: 5,
-                alignItems: "center",
-              }}
-            >
-              <View style={{ justifyContent: "flex-start", paddingLeft: 15 }}>
-                <Ionicons
-                  name="phone-portrait-outline"
-                  size={24}
-                  color="white"
-                />
-              </View>
-              <View style={{ paddingLeft: 15 }}>
-                {/* <Text style={{color:"#9CA3AF" , fontFamily:"Poppins-Light"}}>
+              <View style={styles.detailView}>
+                <View style={styles.detailsIcon}>
+                  <Ionicons name="phone-portrait-outline" size={24} color="white" />
+                </View>
+                <View style={{ paddingLeft: 15 }}>
+                  {/* <Text style={{color:"#9CA3AF" , fontFamily:"Poppins-Light"}}>
                                     Phone
                                 </Text> */}
-                <Text
-                  style={{
-                    fontFamily: "Poppins-Regular",
-                    fontSize: 18,
-                    color: "#fff",
-                  }}
-                >
-                  {user?.phoneNo}
-                </Text>
+                  <Text style={styles.detailText}>
+                    {user ? user.phoneNo : "91363592345"}
+                  </Text>
+                </View>
               </View>
-            </View>
 
-            <View
-              style={{
-                marginVertical: 6,
-                display: "flex",
-                width: "100%",
-                flexDirection: "row",
-                paddingVertical: 5,
-                alignItems: "center",
-              }}
-            >
-              <View style={{ justifyContent: "flex-start", paddingLeft: 15 }}>
-                <Ionicons name="school" size={24} style={{ color: "white" }} />
-              </View>
-              <View style={{ paddingLeft: 15 }}>
-                {/* <Text style={{color:"#9CA3AF" , fontFamily:"Poppins-Light"}}>
+              <View style={styles.detailView}>
+                <View style={styles.detailsIcon}>
+                  <Ionicons name='school' size={24} style={{ color: "white" }} />
+                </View>
+                <View style={{ paddingLeft: 15 }}>
+                  {/* <Text style={{color:"#9CA3AF" , fontFamily:"Poppins-Light"}}>
                                     Current Sem
                                 </Text> */}
-                <Text style={{ fontFamily: "", fontSize: 18, color: "#fff" }}>
-                  {user?.currentSemester}
-                </Text>
+                  <Text style={styles.detailText}>
+                    {user ? user.currentSemester : "3rd SEM"}
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
-        </View>
-        <View style={{ marginTop: 20, width: "100%" }}>
-          <TouchableOpacity
-            style={{ borderRadius: 6, backgroundColor: "#19aa59" }}
-            onPress={() => router.replace("/(app)/(shared)/attendance")}
-          >
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                width: "100%",
-                alignItems: "center",
-                justifyContent: "space-evenly",
-              }}
-            >
-              <Text style={{ padding: 10, fontFamily: "Poppins-Regular" }}>
-                Get Attendance Analysis
-              </Text>
-              <Ionicons name="arrow-forward" size={25} />
-            </View>
-          </TouchableOpacity>
-        </View>
 
-        <View>
-          <TouchableOpacity onPress={() => router.replace("/login")}>
-            <Text>Go HOME</Text>
-          </TouchableOpacity>
+
+
+
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 }
 const styles = StyleSheet.create({
-  avatarImage: {
-    width: 100,
-    height: 100,
+  detailText: { fontFamily: "Poppins-Regular", fontSize: 17, color: "#fff", paddingVertical: 10 },
+  detailView: { display: "flex", width: "100%", flexDirection: "row", paddingVertical: 5, alignItems: "center" },
+  detailsIcon: { justifyContent: "flex-start", paddingLeft: 15 },
+  profileCardTextContainer: {
+    flex: 1, width: "100%", padding: 10
   },
-  profileText: { color: "#FFFFFF", fontFamily: "Poppins-Regular", padding: 5 },
+  profileInfo: { fontFamily: "DMSerifDisplay-Regular", color: "#19aa59", fontSize: 26 }
+  ,
+  avatarImage: {
+    borderColor: "#19aa59",
+    width: 80,
+    height: 80,
+    backgroundColor: "",
+    borderRadius: 50, borderWidth: 2
+  },
+  profileCard: { display: "flex", flexDirection: "row", backgroundColor: "hsla(120, 5%, 10%, 1)", borderRadius: 20, alignItems: "center", borderColor: "hsla(120 , 10% , 20% , 0.4)", borderWidth: 2, }
+  ,
+  detailsCard: {
+    display: "flex",
+    width: "100%",
+    marginTop: 20,
+    backgroundColor: "hsl(hsla(120, 5%, 10%, 1))", borderRadius: 20,
+    borderColor: "hsla(120 , 5% , 20% , 0.4)",
+    borderWidth: 2,
+  }
+  ,
+  profileText: {
+    color: "#FFFFFF",
+    fontFamily: "Poppins-Regular",
+    padding: 5
+  }
+  ,
   profileHeader: {
     flexDirection: `row`,
-    justifyContent: "space-evenly",
+    justifyContent: "space-evenly"
   },
   container: {
     flex: 1,
@@ -254,7 +149,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingTop: 50,
+    paddingTop: 100,
     alignItems: "center",
     paddingVertical: 20,
   },
@@ -268,6 +163,11 @@ const styles = StyleSheet.create({
     fontSize: 34,
     marginBottom: 10,
     fontFamily: "DMSerifDisplay-Regular",
+    color: "#FFFFFF",
+  },
+  subtitleProfile: {
+    fontSize: 14,
+    fontFamily: "Poppins-Regular",
     color: "#FFFFFF",
   },
   subtitle: {
@@ -290,6 +190,16 @@ const styles = StyleSheet.create({
     color: "#D1D5DB",
     textDecorationLine: "underline",
   },
+  profileCardText: {
+    fontSize: 18,
+    marginBottom: 5,
+    fontFamily: "DMSerifDisplay-Regular",
+    color: "#19aa59",
+    flex: 1,
+    flexWrap: "wrap"
+  }
+  ,
+
   accentTitle: {
     fontSize: 34,
     marginBottom: 10,

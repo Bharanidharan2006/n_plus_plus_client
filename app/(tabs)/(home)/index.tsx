@@ -4,18 +4,18 @@ import { useAuthStore } from "@/stores/auth.store";
 import { useTimeTableStore } from "@/stores/timeTable.store";
 import { useUserStore } from "@/stores/user.store";
 import {
-  GetAttendancePercentageQuery,
-  GetAttendancePercentageQueryVariables,
-  GetLatestWeekQuery,
-  GetUserQuery,
-  GetUserQueryVariables,
-  MarkAttendanceFromNotificationMutation,
-  MarkAttendanceFromNotificationMutationVariables,
-  RefreshTokenMutation,
-  RefreshTokenMutationVariables,
-  UpdatePushNotificationTokenMutation,
-  UpdatePushNotificationTokenMutationVariables,
-  Week,
+    GetAttendancePercentageQuery,
+    GetAttendancePercentageQueryVariables,
+    GetLatestWeekQuery,
+    GetUserQuery,
+    GetUserQueryVariables,
+    MarkAttendanceFromNotificationMutation,
+    MarkAttendanceFromNotificationMutationVariables,
+    RefreshTokenMutation,
+    RefreshTokenMutationVariables,
+    UpdatePushNotificationTokenMutation,
+    UpdatePushNotificationTokenMutationVariables,
+    Week,
 } from "@/types/__generated__/graphql";
 import { subjectCodeMap } from "@/types/helpers";
 import { getStorageItemSync, removeItemSync } from "@/utils/storage";
@@ -27,12 +27,21 @@ import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
 import {
+<<<<<<< Updated upstream
   Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+=======
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+>>>>>>> Stashed changes
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -274,6 +283,7 @@ const Home = () => {
   useEffect(() => {
     (async () => {
       if (newRefreshToken) {
+<<<<<<< Updated upstream
         Platform.OS === "web"
           ? typeof localStorage !== "undefined"
             ? localStorage.setItem(
@@ -297,6 +307,31 @@ const Home = () => {
               "refreshToken",
               newRefreshToken.refreshToken.refreshToken
             );
+=======
+        if (Platform.OS === "web") {
+          try {
+            if (typeof localStorage !== "undefined") {
+              localStorage.setItem(
+                "refreshToken",
+                newRefreshToken.refreshToken.refreshToken
+              );
+              localStorage.setItem(
+                "accessToken",
+                newRefreshToken.refreshToken.accessToken
+              );
+            }
+          } catch {}
+        } else {
+          await SecureStore.setItemAsync(
+            "refreshToken",
+            newRefreshToken.refreshToken.refreshToken
+          );
+          await SecureStore.setItemAsync(
+            "accessToken",
+            newRefreshToken.refreshToken.accessToken
+          );
+        }
+>>>>>>> Stashed changes
         setTokens(
           newRefreshToken.refreshToken.accessToken,
           newRefreshToken.refreshToken.refreshToken
