@@ -1,23 +1,25 @@
 import { ScrollView, StyleSheet } from "react-native";
 
-import React, { Component } from 'react'
-import { Text, View, Image } from 'react-native'
-import { useUserStore } from "@/stores/user.store";
 import { useAuthStore } from "@/stores/auth.store";
-import { router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useUserStore } from "@/stores/user.store";
 import { Ionicons } from "@expo/vector-icons";
-
+import { router } from "expo-router";
+import React from "react";
+import { Image, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Profile() {
-  const user = useUserStore((state) => state.user)
-  const setLoggedIn = useAuthStore(state => state.setLoggedIn);
-  const getAvatar = (seed: string) => `https://api.dicebear.com/7.x/avataaars/png?seed=${encodeURIComponent(seed)}`
+  const user = useUserStore((state) => state.user);
+  const setLoggedIn = useAuthStore((state) => state.setLoggedIn);
+  const getAvatar = (seed: string) =>
+    `https://api.dicebear.com/7.x/avataaars/png?seed=${encodeURIComponent(
+      seed
+    )}`;
   const handleLogout = () => {
     setLoggedIn(false);
-    router.navigate("/login")
-  }
-  const avatar = getAvatar(user?.userName ? user.userName : "defaultPerson") // change with name
+    router.navigate("/login");
+  };
+  const avatar = getAvatar(user?.userName ? user.userName : "defaultPerson"); // change with name
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -29,33 +31,31 @@ export default function Profile() {
             <View style={styles.profileCardTextContainer}>
               <View style={{ display: "flex" }}>
                 <Text style={styles.profileCardText}>
-                  {(user && user.userName) || "USERNAME USERNAME USERNAME USERNAME USERNAME"}
-
+                  {(user && user.userName) ||
+                    "USERNAME USERNAME USERNAME USERNAME USERNAME"}
                 </Text>
               </View>
 
               <View>
                 <Text style={styles.subtitleProfile}>
-                  2024103040
+                  {user ? user.rollNo : "202410XXXX"}
                 </Text>
               </View>
-
             </View>
-
           </View>
-
 
           <View style={styles.detailsCard}>
             <View style={{ paddingLeft: 20, paddingTop: 20 }}>
-              <Text style={styles.profileInfo}>
-                Personal Info
-              </Text>
+              <Text style={styles.profileInfo}>Personal Info</Text>
             </View>
             <View style={{ padding: 10, display: "flex", flex: 1 }}>
               <View style={styles.detailView}>
-
                 <View style={styles.detailsIcon}>
-                  <Ionicons name='mail-outline' size={24} style={{ color: "white" }} />
+                  <Ionicons
+                    name="mail-outline"
+                    size={24}
+                    style={{ color: "white" }}
+                  />
                 </View>
                 <View style={{ paddingLeft: 15 }}>
                   {/* <Text style={{color:"#9CA3AF" , fontFamily:"Poppins-Light"}}>
@@ -69,7 +69,11 @@ export default function Profile() {
 
               <View style={styles.detailView}>
                 <View style={styles.detailsIcon}>
-                  <Ionicons name="phone-portrait-outline" size={24} color="white" />
+                  <Ionicons
+                    name="phone-portrait-outline"
+                    size={24}
+                    color="white"
+                  />
                 </View>
                 <View style={{ paddingLeft: 15 }}>
                   {/* <Text style={{color:"#9CA3AF" , fontFamily:"Poppins-Light"}}>
@@ -83,7 +87,11 @@ export default function Profile() {
 
               <View style={styles.detailView}>
                 <View style={styles.detailsIcon}>
-                  <Ionicons name='school' size={24} style={{ color: "white" }} />
+                  <Ionicons
+                    name="school"
+                    size={24}
+                    style={{ color: "white" }}
+                  />
                 </View>
                 <View style={{ paddingLeft: 15 }}>
                   {/* <Text style={{color:"#9CA3AF" , fontFamily:"Poppins-Light"}}>
@@ -96,51 +104,70 @@ export default function Profile() {
               </View>
             </View>
           </View>
-
-
-
-
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
 const styles = StyleSheet.create({
-  detailText: { fontFamily: "Poppins-Regular", fontSize: 17, color: "#fff", paddingVertical: 10 },
-  detailView: { display: "flex", width: "100%", flexDirection: "row", paddingVertical: 5, alignItems: "center" },
+  detailText: {
+    fontFamily: "Poppins-Regular",
+    fontSize: 17,
+    color: "#fff",
+    paddingVertical: 10,
+  },
+  detailView: {
+    display: "flex",
+    width: "100%",
+    flexDirection: "row",
+    paddingVertical: 5,
+    alignItems: "center",
+  },
   detailsIcon: { justifyContent: "flex-start", paddingLeft: 15 },
   profileCardTextContainer: {
-    flex: 1, width: "100%", padding: 10
+    flex: 1,
+    width: "100%",
+    padding: 10,
   },
-  profileInfo: { fontFamily: "DMSerifDisplay-Regular", color: "#19aa59", fontSize: 26 }
-  ,
+  profileInfo: {
+    fontFamily: "DMSerifDisplay-Regular",
+    color: "#19aa59",
+    fontSize: 26,
+  },
   avatarImage: {
     borderColor: "#19aa59",
     width: 80,
     height: 80,
     backgroundColor: "",
-    borderRadius: 50, borderWidth: 2
+    borderRadius: 50,
+    borderWidth: 2,
   },
-  profileCard: { display: "flex", flexDirection: "row", backgroundColor: "hsla(120, 5%, 10%, 1)", borderRadius: 20, alignItems: "center", borderColor: "hsla(120 , 10% , 20% , 0.4)", borderWidth: 2, }
-  ,
+  profileCard: {
+    display: "flex",
+    flexDirection: "row",
+    backgroundColor: "hsla(120, 5%, 10%, 1)",
+    borderRadius: 20,
+    alignItems: "center",
+    borderColor: "hsla(120 , 10% , 20% , 0.4)",
+    borderWidth: 2,
+  },
   detailsCard: {
     display: "flex",
     width: "100%",
     marginTop: 20,
-    backgroundColor: "hsl(hsla(120, 5%, 10%, 1))", borderRadius: 20,
+    backgroundColor: "hsl(hsla(120, 5%, 10%, 1))",
+    borderRadius: 20,
     borderColor: "hsla(120 , 5% , 20% , 0.4)",
     borderWidth: 2,
-  }
-  ,
+  },
   profileText: {
     color: "#FFFFFF",
     fontFamily: "Poppins-Regular",
-    padding: 5
-  }
-  ,
+    padding: 5,
+  },
   profileHeader: {
     flexDirection: `row`,
-    justifyContent: "space-evenly"
+    justifyContent: "space-evenly",
   },
   container: {
     flex: 1,
@@ -196,10 +223,8 @@ const styles = StyleSheet.create({
     fontFamily: "DMSerifDisplay-Regular",
     color: "#19aa59",
     flex: 1,
-    flexWrap: "wrap"
-  }
-  ,
-
+    flexWrap: "wrap",
+  },
   accentTitle: {
     fontSize: 34,
     marginBottom: 10,

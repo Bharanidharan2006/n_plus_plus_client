@@ -4,18 +4,18 @@ import { useAuthStore } from "@/stores/auth.store";
 import { useTimeTableStore } from "@/stores/timeTable.store";
 import { useUserStore } from "@/stores/user.store";
 import {
-    GetAttendancePercentageQuery,
-    GetAttendancePercentageQueryVariables,
-    GetLatestWeekQuery,
-    GetUserQuery,
-    GetUserQueryVariables,
-    MarkAttendanceFromNotificationMutation,
-    MarkAttendanceFromNotificationMutationVariables,
-    RefreshTokenMutation,
-    RefreshTokenMutationVariables,
-    UpdatePushNotificationTokenMutation,
-    UpdatePushNotificationTokenMutationVariables,
-    Week,
+  GetAttendancePercentageQuery,
+  GetAttendancePercentageQueryVariables,
+  GetLatestWeekQuery,
+  GetUserQuery,
+  GetUserQueryVariables,
+  MarkAttendanceFromNotificationMutation,
+  MarkAttendanceFromNotificationMutationVariables,
+  RefreshTokenMutation,
+  RefreshTokenMutationVariables,
+  UpdatePushNotificationTokenMutation,
+  UpdatePushNotificationTokenMutationVariables,
+  Week,
 } from "@/types/__generated__/graphql";
 import { subjectCodeMap } from "@/types/helpers";
 import { getStorageItemSync, removeItemSync } from "@/utils/storage";
@@ -27,21 +27,12 @@ import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
 import {
-<<<<<<< Updated upstream
   Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-=======
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
->>>>>>> Stashed changes
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -247,6 +238,7 @@ const Home = () => {
         }
       }
     }
+
     if (weekData) {
       setWeek(weekData.getLatestWeek);
       setTimeTable(weekData.getLatestWeek.timeTable);
@@ -268,6 +260,7 @@ const Home = () => {
   //When the user data has been fetched successfully, we will call the getExpoPushToken function so it will change the notificationToken state
 
   useEffect(() => {
+    if (Platform.OS === "web") return;
     if (notificationToken && user) {
       if (notificationToken !== user.notificationToken) {
         updatePushNotificationToken({
@@ -283,7 +276,6 @@ const Home = () => {
   useEffect(() => {
     (async () => {
       if (newRefreshToken) {
-<<<<<<< Updated upstream
         Platform.OS === "web"
           ? typeof localStorage !== "undefined"
             ? localStorage.setItem(
@@ -307,31 +299,7 @@ const Home = () => {
               "refreshToken",
               newRefreshToken.refreshToken.refreshToken
             );
-=======
-        if (Platform.OS === "web") {
-          try {
-            if (typeof localStorage !== "undefined") {
-              localStorage.setItem(
-                "refreshToken",
-                newRefreshToken.refreshToken.refreshToken
-              );
-              localStorage.setItem(
-                "accessToken",
-                newRefreshToken.refreshToken.accessToken
-              );
-            }
-          } catch {}
-        } else {
-          await SecureStore.setItemAsync(
-            "refreshToken",
-            newRefreshToken.refreshToken.refreshToken
-          );
-          await SecureStore.setItemAsync(
-            "accessToken",
-            newRefreshToken.refreshToken.accessToken
-          );
-        }
->>>>>>> Stashed changes
+
         setTokens(
           newRefreshToken.refreshToken.accessToken,
           newRefreshToken.refreshToken.refreshToken
@@ -339,9 +307,13 @@ const Home = () => {
         refetch();
       }
     })();
-  }, [newRefreshToken]);
+
+    if (refreshTokenError) console.log(refreshTokenError);
+  }, [newRefreshToken, refreshTokenError]);
 
   useEffect(() => {
+    console.log(refreshTokenStored);
+
     if (error?.message.includes("Access token expired.")) {
       getNewAccessToken({
         variables: { refreshToken: refreshTokenStored },
@@ -354,6 +326,7 @@ const Home = () => {
 
   const sendPendingAttendances = async (notificationLogs: any) => {
     if (Platform.OS === "web") return;
+
     // [ ] - TODO
     //Currently catching errors and removing pending actions as a whole instead of sending request and removing one by one. Need to find a better way.
     try {

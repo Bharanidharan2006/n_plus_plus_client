@@ -197,15 +197,17 @@ const AttendanceRecord = () => {
                 <Text style={styles.historyMonth}>
                   {monthMap[Number(monthNumber)]}
                 </Text>
-                {records.map((record, i) => (
-                  <AttendanceEntry
-                    key={`${record.date}-${i}`}
-                    date={record.date}
-                    periods={record.periods}
-                    attended={record.attended}
-                    isUpdated={record.isUpdated}
-                  />
-                ))}
+                {records
+                  .sort((a, b) => new Date(b.date) - new Date(a.date))
+                  .map((record, i) => (
+                    <AttendanceEntry
+                      key={`${record.date}-${i}`}
+                      date={record.date}
+                      periods={record.periods}
+                      attended={record.attended}
+                      isUpdated={record.isUpdated}
+                    />
+                  ))}
               </React.Fragment>
             ))}
       </ScrollView>

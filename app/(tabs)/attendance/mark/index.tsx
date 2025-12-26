@@ -1,3 +1,4 @@
+import UpToDate from "@/components/UpToDate";
 import { useAuthStore } from "@/stores/auth.store";
 import { useUserStore } from "@/stores/user.store";
 import { useMutation, useQuery } from "@apollo/client/react";
@@ -54,7 +55,6 @@ const PendingAttendanceIndex = () => {
   useEffect(() => {
     (async () => {
       try {
-<<<<<<< Updated upstream
         let refreshTokenStored;
         let accessTokenStored;
         if (Platform.OS === "web" && typeof localStorage !== "undefined") {
@@ -65,20 +65,6 @@ const PendingAttendanceIndex = () => {
           refreshTokenStored = await SecureStore.getItemAsync("refreshToken");
         }
 
-=======
-        const accessTokenStored =
-          Platform.OS === "web"
-            ? typeof localStorage !== "undefined"
-              ? localStorage.getItem("accessToken")
-              : null
-            : await SecureStore.getItemAsync("accessToken");
-        const refreshTokenStored =
-          Platform.OS === "web"
-            ? typeof localStorage !== "undefined"
-              ? localStorage.getItem("refreshToken")
-              : null
-            : await SecureStore.getItemAsync("refreshToken");
->>>>>>> Stashed changes
         setTokens(accessTokenStored ?? "", refreshTokenStored ?? "");
         refetch();
       } catch (e) {
@@ -102,7 +88,6 @@ const PendingAttendanceIndex = () => {
   useEffect(() => {
     (async () => {
       if (newRefreshToken) {
-<<<<<<< Updated upstream
         Platform.OS === "web"
           ? typeof localStorage !== "undefined"
             ? localStorage.setItem(
@@ -126,31 +111,6 @@ const PendingAttendanceIndex = () => {
               "refreshToken",
               newRefreshToken.refreshToken.refreshToken
             );
-=======
-        if (Platform.OS === "web") {
-          try {
-            if (typeof localStorage !== "undefined") {
-              localStorage.setItem(
-                "refreshToken",
-                newRefreshToken.refreshToken.refreshToken
-              );
-              localStorage.setItem(
-                "accessToken",
-                newRefreshToken.refreshToken.accessToken
-              );
-            }
-          } catch {}
-        } else {
-          await SecureStore.setItemAsync(
-            "refreshToken",
-            newRefreshToken.refreshToken.refreshToken
-          );
-          await SecureStore.setItemAsync(
-            "accessToken",
-            newRefreshToken.refreshToken.accessToken
-          );
-        }
->>>>>>> Stashed changes
         setTokens(
           newRefreshToken.refreshToken.accessToken,
           newRefreshToken.refreshToken.refreshToken
@@ -165,7 +125,7 @@ const PendingAttendanceIndex = () => {
       <Text style={styles.pageTitle}>Pending Attendance Updates</Text>
       <ScrollView style={styles.slotContainer}>
         {user?.pendingDates && user?.pendingDates.length == 0 ? (
-          <Text>You are up to date</Text>
+          <UpToDate />
         ) : (
           user?.pendingDates?.map((date) => (
             <TouchableOpacity key={Math.random()}>
@@ -191,6 +151,7 @@ const styles = StyleSheet.create({
   },
   slotContainer: {
     marginTop: 30,
+    flex: 1,
   },
   slotElement: {
     backgroundColor: "#272727",

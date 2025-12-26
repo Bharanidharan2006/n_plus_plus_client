@@ -127,18 +127,15 @@ function RootLayout() {
   useEffect(() => {
     (async () => {
       try {
-        const accessToken =
-          Platform.OS === "web"
-            ? (typeof localStorage !== "undefined"
-                ? localStorage.getItem("accessToken")
-                : null)
-            : await SecureStore.getItemAsync("accessToken"); // 
-        const refreshToken =
-          Platform.OS === "web"
-            ? (typeof localStorage !== "undefined"
-                ? localStorage.getItem("refreshToken")
-                : null)
-            : await SecureStore.getItemAsync("refreshToken");
+        let accessToken;
+        let refreshToken;
+        if (Platform.OS === "web") {
+          accessToken = localStorage.getItem("accessToken");
+          refreshToken = localStorage.getItem("refreshToken");
+        } else {
+          accessToken = await SecureStore.getItemAsync("accessToken");
+          refreshToken = await SecureStore.getItemAsync("refreshToken");
+        }
         if (accessToken && refreshToken) {
           setTokens(accessToken, refreshToken);
           setLoggedIn(true);
