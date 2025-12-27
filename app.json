@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +21,8 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.bharanidharankuppuchamy.nplusplusclient",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "bundler": "metro",
@@ -49,6 +53,9 @@
       "eas": {
         "projectId": "0eced8a0-2a38-4753-bb6a-41212b85e6c4"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/0eced8a0-2a38-4753-bb6a-41212b85e6c4"
     }
   }
 }

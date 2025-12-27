@@ -172,13 +172,6 @@ export default function Login() {
               >
                 <Text style={styles.forgotText}>Forgot Password?</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                touchSoundDisabled={false}
-                style={styles.forgotWrapper}
-                onPress={() => router.replace("/profile")}
-              >
-                <Text style={styles.forgotText}>profile</Text>
-              </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={handleLogin}
