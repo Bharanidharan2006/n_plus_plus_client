@@ -123,6 +123,8 @@ function RootLayout() {
     "Poppins-ExtraBold": Poppins_800ExtraBold,
   });
 
+  //Extra
+
   useEffect(() => {
     (async () => {
       try {
