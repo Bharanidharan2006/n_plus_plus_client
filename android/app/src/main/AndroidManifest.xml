@@ -26,8 +26,8 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="nplusplusclient"/>
-        <data android:scheme="exp+nplusplusclient"/>
+        <data android:scheme="N Space"/>
+        <data android:scheme="exp+nspace"/>
       </intent-filter>
     </activity>
   </application>
