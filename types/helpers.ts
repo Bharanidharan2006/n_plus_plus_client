@@ -62,23 +62,23 @@ export const saturdayOrderMapReverse = new Map([
 ]);
 
 export const subjectCodeMap: Record<string, string> = {
-  CS23301: "SWE", // key: string, value: string
-  CS23302: "DSA",
-  CS23303: "DSD",
-  CS23304: "Java",
-  MA23C05: "Math",
-  CS23U01: "Stds",
-  CS23S01: "SDC",
-  UC23U01: "UHV",
+  CS23401: "DBMS", // key: string, value: string
+  CS23402: "CA",
+  CS23403: "FST",
+  CS23404: "DAA",
+  MA23C03: "Math",
+  SDC: "SDC",
+  IOC: "IOC",
+  AUDIT: "Audit",
 };
 
 export const subjectNameMap: Record<string, string> = {
-  SWE: "CS23301",
-  DSA: "CS23302",
-  DSD: "CS23303",
-  Java: "CS23304",
-  Math: "MA23C05",
-  Stds: "CS23U01",
-  SDC: "CS23S01",
-  UHV: "UC23U01",
+  DBMS: "CS23401",
+  CA: "CS23402",
+  FST: "CS23403",
+  DAA: "CS23404",
+  Math: "MA23C03",
+  SDC: "SDC",
+  IOC: "IOC",
+  Audit: "AUDIT",
 };
