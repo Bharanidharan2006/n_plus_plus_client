@@ -11,7 +11,6 @@ import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect, useState } from "react";
 import {
-  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -182,7 +181,7 @@ export default function Login() {
             </View>
           </View>
 
-          {!keyboardVisible && (
+          {/*{!keyboardVisible && (
             <View style={styles.iconWrapper}>
               <Image
                 source={require("../assets/images/logo.png")}
@@ -190,7 +189,7 @@ export default function Login() {
                 resizeMode="contain"
               />
             </View>
-          )}
+          )}*/}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -200,7 +199,7 @@ export default function Login() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1A1A1A",
+    backgroundColor: "#1D1D1D",
     paddingHorizontal: 32,
   },
   scrollContainer: {

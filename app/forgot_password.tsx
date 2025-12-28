@@ -8,7 +8,6 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -176,13 +175,13 @@ export default function ForgotPassword() {
           </View>
 
           {/* Logo at the bottom */}
-          <View style={styles.iconWrapper}>
+          {/*<View style={styles.iconWrapper}>
             <Image
               source={require("../assets/images/logo.png")}
               style={{ width: 20, height: 20 }}
               resizeMode="contain"
             />
-          </View>
+          </View>*/}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -192,7 +191,7 @@ export default function ForgotPassword() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1A1A1A",
+    backgroundColor: "#1D1D1D",
     paddingHorizontal: 32,
   },
   scrollContainer: {

@@ -1,7 +1,10 @@
+import LoadingScreen from "@/components/LoadingScreen";
 import { useAuthStore } from "@/stores/auth.store";
+import { useLoadingStore } from "@/stores/loading.store";
+import { loadingLink } from "@/utils/apolloLoadingLink";
 import { NotificationProvider } from "@/utils/NotificationProvider";
 import { shouldBeHandledByBGTask } from "@/utils/registerTask";
-import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+import { ApolloClient, from, HttpLink, InMemoryCache } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
 import {
   DMSerifDisplay_400Regular,
@@ -21,7 +24,7 @@ import * as Notifications from "expo-notifications";
 import { Stack, useRootNavigationState } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Platform } from "react-native";
 import {
   cacheExchange,
@@ -48,7 +51,7 @@ const client = createClient({
 });
 
 const apolloClient = new ApolloClient({
-  link: new HttpLink({ uri: API_LINK }),
+  link: from([loadingLink, new HttpLink({ uri: API_LINK })]),
   cache: new InMemoryCache(),
 });
 
@@ -78,9 +81,7 @@ Notifications.setNotificationHandler({
 function RootLayout() {
   const { loggedIn, setTokens, setLoggedIn } = useAuthStore((state) => state);
   const navReady = useRootNavigationState();
-  const [apolloReady, setApolloReady] = useState(false);
-  const [targetRoute, setTargetRoute] = useState<string | null>(null);
-  const [appReady, setAppReady] = useState(false);
+  const { isLoading, setLoading } = useLoadingStore((state) => state);
 
   // useEffect(() => {
   //   if (apolloClient) {
@@ -163,6 +164,7 @@ function RootLayout() {
                 <Stack.Screen name="forgot_password" />
               </Stack.Protected>
             </Stack>
+            {isLoading && <LoadingScreen />}
           </NotificationProvider>
         </ApolloProvider>
       </Provider>

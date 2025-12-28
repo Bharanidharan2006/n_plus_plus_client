@@ -1,21 +1,54 @@
-import { ScrollView, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
 import { useAuthStore } from "@/stores/auth.store";
 import { useUserStore } from "@/stores/user.store";
+import { gql, TypedDocumentNode } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import * as SecureStorage from "expo-secure-store";
 import { Image, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const LOGOUT: TypedDocumentNode = gql`
+  mutation Logout($rollno: Float!) {
+    logout(rollno: $rollno)
+  }
+`;
+
 export default function Profile() {
   const user = useUserStore((state) => state.user);
+  const { accessToken, refreshToken } = useAuthStore((state) => state);
   const setLoggedIn = useAuthStore((state) => state.setLoggedIn);
   const getAvatar = (seed: string) =>
     `https://api.dicebear.com/7.x/initials/png?seed=${encodeURIComponent(
       seed
     )}&&backgroundColor=1B1B1B`;
 
-  const handleLogout = () => {
+  const [logout, { data, error }] = useMutation(LOGOUT, {
+    variables: { rollno: user?.rollNo },
+    context: {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+    },
+  });
+
+  const handleLogout = async () => {
+    if (Platform.OS === "web" && typeof localStorage !== "undefined") {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+    } else {
+      await SecureStorage.deleteItemAsync("accessToken");
+      await SecureStorage.deleteItemAsync("refreshToken");
+    }
+
+    await logout();
     setLoggedIn(false);
     router.navigate("/login");
   };
@@ -51,9 +84,7 @@ export default function Profile() {
                 size={24}
                 style={styles.detailsIcon}
               />
-              <Text style={styles.detailText}>
-                {user ? user.email : "lmelvindenish@wkrejjaweqma.com"}
-              </Text>
+              <Text style={styles.detailText}>{user ? user.email : ""}</Text>
             </View>
 
             <View style={styles.detailView}>

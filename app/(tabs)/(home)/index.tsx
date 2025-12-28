@@ -1,7 +1,6 @@
 import BarChart from "@/components/BarChart";
 import TimeTable from "@/components/TimeTable";
 import { useAuthStore } from "@/stores/auth.store";
-import { useLoadingStore } from "@/stores/loading.store";
 import { useTimeTableStore } from "@/stores/timeTable.store";
 import { useUserStore } from "@/stores/user.store";
 import {
@@ -130,11 +129,6 @@ export const GET_ATTENDANCE_PERCENTAGE: TypedDocumentNode<
 `;
 
 const Home = () => {
-  const setLoading = useLoadingStore((state) => state.setLoading);
-
-  //Setting the loading state
-  setLoading(true);
-
   const router = useRouter();
   const setUser = useUserStore((state) => state.setUser);
   const user = useUserStore((state) => state.user);
@@ -156,7 +150,12 @@ const Home = () => {
     }[]
   >([]);
 
-  const { data, error, refetch } = useQuery(GET_USER, {
+  const {
+    data,
+    error,
+    loading: userLoading,
+    refetch,
+  } = useQuery(GET_USER, {
     variables: { token: accessToken },
     context: {
       headers: {
@@ -164,7 +163,11 @@ const Home = () => {
       },
     },
   });
-  const { data: weekData, error: weekError } = useQuery(GET_WEEK_SCHEDULE, {
+  const {
+    data: weekData,
+    error: weekError,
+    loading: scheduleLoading,
+  } = useQuery(GET_WEEK_SCHEDULE, {
     variables: { token: accessToken },
     context: {
       headers: {
@@ -175,6 +178,7 @@ const Home = () => {
   const {
     data: attendancePercentageData,
     error: attendancePercentageError,
+    loading: attendancePercentageLoading,
     refetch: attendancePercentageRefetch,
   } = useQuery(GET_ATTENDANCE_PERCENTAGE, {
     variables: { rollNo: user?.rollNo ? user.rollNo : 0 },
@@ -186,7 +190,11 @@ const Home = () => {
   });
   const [
     getNewAccessToken,
-    { data: newRefreshToken, loading, error: refreshTokenError },
+    {
+      data: newRefreshToken,
+      loading: refreshTokenLoading,
+      error: refreshTokenError,
+    },
   ] = useMutation(REFRESH_TOKEN);
   const [updatePushNotificationToken, { data: isTokenUpdated }] = useMutation(
     UPDATE_PUSH_NOTIFICATION_TOKEN,
@@ -237,7 +245,6 @@ const Home = () => {
     if (data) {
       setUser(data.getUser);
       attendancePercentageRefetch();
-      setLoading(false);
       if (Platform.OS !== "web") {
         getExpoPushToken();
         const response = Notifications.getLastNotificationResponse();
@@ -252,6 +259,7 @@ const Home = () => {
       setTimeTable(weekData.getLatestWeek.timeTable);
       setSaturdayStatus(weekData.getLatestWeek.saturdayStatus);
       setId(weekData.getLatestWeek.id);
+      console.log(weekData);
     }
     if (attendancePercentageData) {
       const modifiedAttendanceReport =

@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "n_plus_plus_client",
-    "slug": "n_plus_plus_client",
-    "version": "1.0.0",
+    "name": "N Space",
+    "slug": "N Space",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "nplusplusclient",
+    "scheme": "N Space",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -37,7 +37,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#1d1d1d"
         }
       ],
       "expo-secure-store",

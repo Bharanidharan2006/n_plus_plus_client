@@ -8,6 +8,7 @@ import {
   GetAttendanceRecordQueryVariables,
 } from "@/types/__generated__/graphql";
 import { monthMap } from "@/types/helpers";
+import { getUserToken } from "@/utils/tokens";
 import { gql, TypedDocumentNode } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import { Ionicons } from "@expo/vector-icons";
@@ -22,6 +23,18 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { GET_USER } from "../../(home)";
+
+const GET_SINGLE_SUBJECT_INFO = gql`
+  query GetSubjectInfo($id: String!) {
+    getSubjectInfo(id: $id) {
+      id
+      subjectCode
+      subjectTitle
+      contactHoursPerWeek
+    }
+  }
+`;
 
 const GET_ATTENDANCE_RECORD: TypedDocumentNode<
   GetAttendanceRecordQuery,
@@ -50,7 +63,8 @@ const GET_ATTENDANCE_RECORD: TypedDocumentNode<
 const AttendanceRecord = () => {
   const { id } = useLocalSearchParams();
   const subject = useSubjectStore((state) => state.currentSubject);
-  const user = useUserStore((state) => state.user);
+  const setCurrentSubject = useSubjectStore((state) => state.setCurrentSubject);
+  const { user, setUser } = useUserStore((state) => state);
   const accessToken = useAuthStore((state) => state.accessToken);
   const [attendanceRecordMap, setAttendanceRecordMap] = useState<
     Map<number, any>
@@ -58,8 +72,22 @@ const AttendanceRecord = () => {
   const [attendanceRecordStatus, setAttendanceRecordStatus] = useState(false);
   const [missedContactHours, setMissedContactHours] = useState(0);
   const [noOfBunkableContactHours, setNoofBunkableContactHours] = useState(0);
+  const {
+    data: userData,
+    error: userError,
+    refetch: userDataRefetch,
+  } = useQuery(GET_USER, {
+    variables: {
+      token: accessToken,
+    },
+    context: {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+    },
+  });
 
-  const { data, error } = useQuery(GET_ATTENDANCE_RECORD, {
+  const { data, error, refetch } = useQuery(GET_ATTENDANCE_RECORD, {
     variables: { rollNo: user?.rollNo ? user.rollNo : 0, subjectId: id },
     context: {
       headers: {
@@ -67,6 +95,20 @@ const AttendanceRecord = () => {
       },
     },
   });
+
+  const { data: subjectData, error: subjectError } = useQuery(
+    GET_SINGLE_SUBJECT_INFO,
+    {
+      context: {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      },
+      variables: {
+        id: id,
+      },
+    }
+  );
 
   useEffect(() => {
     const attendanceRecord = new Map();
@@ -104,6 +146,33 @@ const AttendanceRecord = () => {
       );
     }
   }, [data, error]);
+
+  useEffect(() => {
+    getUserToken();
+  }, []);
+
+  useEffect(() => {
+    if (subjectData) {
+      console.log(subjectData);
+
+      setCurrentSubject(subjectData.getSubjectInfo);
+    }
+    if (subjectError) {
+      console.log(error);
+    }
+  }, [subjectData, subjectError]);
+
+  useEffect(() => {
+    if (userData) {
+      setUser(userData.getUser);
+      refetch();
+    }
+
+    if (userError && userError.message.includes("Access token expired.")) {
+      console.log(userError.message);
+      router.replace("/(tabs)/(home)");
+    }
+  }, [userData, userError]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -198,7 +267,7 @@ const AttendanceRecord = () => {
                   {monthMap[Number(monthNumber)]}
                 </Text>
                 {records
-                  .sort((a, b) => new Date(b.date) - new Date(a.date))
+                  .sort((a: any, b: any) => new Date(b.date) - new Date(a.date))
                   .map((record, i) => (
                     <AttendanceEntry
                       key={`${record.date}-${i}`}

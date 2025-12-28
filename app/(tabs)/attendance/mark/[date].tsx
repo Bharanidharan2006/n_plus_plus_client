@@ -35,8 +35,16 @@ export const UPDATE_DAILY_ATTENDANCE: TypedDocumentNode<
 
 const parseDate = (date: any): Date => {
   const [dd, mm, yyyy] = date.split("-").map(Number);
+  console.log(yyyy, mm - 1, dd);
   return new Date(yyyy, mm - 1, dd);
 };
+
+function formatDDMMYYYY(date: any) {
+  const d = String(date.getDate()).padStart(2, "0");
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const y = date.getFullYear();
+  return `${d}-${m}-${y}`;
+}
 
 const UpdatePendingAttendance = () => {
   const { date } = useLocalSearchParams();
@@ -56,6 +64,7 @@ const UpdatePendingAttendance = () => {
     },
   });
   const dateObj = parseDate(date);
+  //Remove this after moving to indian servers
   const [
     updateAttendance,
     { data: updateAttendanceResponse, error: updateAttendanceError },
@@ -67,7 +76,7 @@ const UpdatePendingAttendance = () => {
     },
     variables: {
       input: {
-        date: dateObj,
+        date: formatDDMMYYYY(parseDate(date)), //This works chill
         attendanceData: attendance,
         rollNo: user ? user.rollNo : 0,
       },
@@ -89,20 +98,24 @@ const UpdatePendingAttendance = () => {
     );
   };
 
-  const handleUpdateAttendance = () => {
-    updateAttendance()
-      .then((d) => {
-        if (d.data?.updateDailyAttendance === true) {
-          if (user) {
-            let newPendingDates = user.pendingDates.filter(
-              (d) => !isSameDate(d, dateObj)
-            );
-            setUser({ ...user, pendingDates: newPendingDates });
-          }
+  useEffect(() => {
+    if (updateAttendanceResponse) {
+      if (updateAttendanceResponse.updateDailyAttendance === true) {
+        if (user) {
+          let newPendingDates = user.pendingDates.filter(
+            (d) => !isSameDate(d, dateObj)
+          );
+          setUser({ ...user, pendingDates: newPendingDates });
         }
-      })
-      .catch((e) => console.log(e));
-    router.back();
+        router.back();
+      }
+    }
+
+    if (updateAttendanceError) console.log(updateAttendanceError);
+  }, [updateAttendanceResponse, updateAttendanceError]);
+
+  const handleUpdateAttendance = async () => {
+    await updateAttendance();
   };
 
   return (
