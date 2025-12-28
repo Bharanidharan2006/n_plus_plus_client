@@ -25,10 +25,13 @@ export default function Profile() {
   const user = useUserStore((state) => state.user);
   const { accessToken, refreshToken } = useAuthStore((state) => state);
   const setLoggedIn = useAuthStore((state) => state.setLoggedIn);
+  // For leo
   const getAvatar = (seed: string) =>
-    `https://api.dicebear.com/7.x/initials/png?seed=${encodeURIComponent(
-      seed
-    )}&&backgroundColor=1B1B1B`;
+    user?.rollNo === 2024103513
+      ? "https://api.dicebear.com/7.x/initials/png?seed=JN&&backgroundColor=1427a6"
+      : `https://api.dicebear.com/7.x/initials/png?seed=${encodeURIComponent(
+          seed
+        )}&&backgroundColor=1B1B1B`;
 
   const [logout, { data, error }] = useMutation(LOGOUT, {
     variables: { rollno: user?.rollNo },
