@@ -5,4 +5,6 @@
 
 ## Check
 
-[ ] - Weather dates are in IST
+[ ] - Change dates and use date string to be server timezone inspecific
+[ ] - Update crons and run them separately since when you scale mutliple instances might run and your cron can run multiple times. Or use db checks
+

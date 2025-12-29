@@ -39,6 +39,18 @@ const parseDate = (date: any): Date => {
   return new Date(yyyy, mm - 1, dd);
 };
 
+const getISTDateAsUTCMidnight = (baseDate: Date = new Date()): Date => {
+  const istDate = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(baseDate);
+
+  // Force UTC midnight for the IST calendar date
+  return new Date(`${istDate}T00:00:59.000Z`);
+};
+
 function formatDDMMYYYY(date: any) {
   const d = String(date.getDate()).padStart(2, "0");
   const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -60,7 +72,7 @@ const UpdatePendingAttendance = () => {
       },
     },
     variables: {
-      date: parseDate(date),
+      date: getISTDateAsUTCMidnight(),
     },
   });
   const dateObj = parseDate(date);
