@@ -72,7 +72,7 @@ const UpdatePendingAttendance = () => {
       },
     },
     variables: {
-      date: getISTDateAsUTCMidnight(),
+      date: getISTDateAsUTCMidnight(parseDate(date)),
     },
   });
   const dateObj = parseDate(date);
